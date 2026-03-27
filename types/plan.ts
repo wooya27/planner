@@ -58,7 +58,7 @@ export interface StudyPlan {
 
 export interface PlanRequest {
   goal: string;
-  totalHours: number;
   dailyHours: number;
+  studyDays: string[];     // e.g. ["Monday","Tuesday","Thursday"]
   targetExamDate?: string;
 }

@@ -1,28 +1,62 @@
 "use client";
 
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { GoalInfo } from "@/types/plan";
 
 interface VisionBoardProps {
-  goalInfo: GoalInfo;
-  studyTips: string[];
+  goalInfo?: GoalInfo | null;
+  studyTips?: string[];
+  onVisionTextChange?: (text: string) => void;
 }
 
 const difficultyConfig = {
   초급: { color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/30", emoji: "🌱" },
   중급: { color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30", emoji: "🔥" },
-  고급: { color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30", emoji: "⚡" },
+  고급: { color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/30",    emoji: "⚡" },
 };
 
-export default function VisionBoard({ goalInfo, studyTips }: VisionBoardProps) {
-  const config = difficultyConfig[goalInfo.difficulty];
-  const weeksLeft = goalInfo.estimatedWeeks;
-  const daysLeft = weeksLeft * 7;
+export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }: VisionBoardProps) {
+  const [visionText, setVisionText] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem("visionText") ?? "" : ""
+  );
+  const [bgImage, setBgImage] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("visionImage") ?? null : null
+  );
+  const [editing, setEditing] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const endDate = new Date(goalInfo.estimatedEndDate);
-  const endDateStr = `${endDate.getFullYear()}년 ${endDate.getMonth() + 1}월 ${endDate.getDate()}일`;
+  const saveVisionText = (v: string) => {
+    setVisionText(v);
+    localStorage.setItem("visionText", v);
+    onVisionTextChange?.(v);
+  };
 
-  // Random motivational quote for ADHD focus
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setBgImage(dataUrl);
+      localStorage.setItem("visionImage", dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setBgImage(null);
+    localStorage.removeItem("visionImage");
+  };
+
+  const config      = goalInfo ? difficultyConfig[goalInfo.difficulty] : null;
+  const weeksLeft   = goalInfo?.estimatedWeeks ?? 0;
+  const daysLeft    = weeksLeft * 7;
+  const endDate     = goalInfo ? new Date(goalInfo.estimatedEndDate) : null;
+  const endDateStr  = endDate
+    ? `${endDate.getFullYear()}년 ${endDate.getMonth() + 1}월 ${endDate.getDate()}일`
+    : null;
+
   const quotes = [
     "지금 이 순간이 기회다 💪",
     "작은 한 걸음이 큰 변화를 만든다 🚀",
@@ -30,105 +64,154 @@ export default function VisionBoard({ goalInfo, studyTips }: VisionBoardProps) {
     "포기하면 그때가 게임 오버 🎯",
     "오늘의 노력이 내일의 나를 만든다 ✨",
   ];
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  const quote = quotes[new Date().getDay() % quotes.length];
 
   return (
-    <div className="relative bg-gradient-to-r from-gray-900 via-gray-900 to-gray-950 border border-gray-800 rounded-xl overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-purple-600/5 rounded-full blur-3xl" />
-      </div>
+    <div className="relative rounded-xl overflow-hidden border border-gray-800" style={{ minHeight: 300 }}>
 
-      <div className="relative p-5">
-        <div className="flex flex-col lg:flex-row gap-5 items-start">
-          {/* Main Vision */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+      {/* Background */}
+      {bgImage ? (
+        <div className="absolute inset-0 z-0">
+          <img src={bgImage} alt="vision" className="w-full h-full object-cover opacity-25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/90" />
+        </div>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 z-0">
+          <div className="absolute -top-20 -right-20 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-purple-600/5 rounded-full blur-3xl" />
+        </div>
+      )}
+
+      <div className="relative z-10 p-6 flex flex-col" style={{ minHeight: 300 }}>
+        <div className="flex flex-col lg:flex-row gap-6 flex-1">
+
+          {/* Left: Vision text */}
+          <div className="flex-1 flex flex-col">
+            {/* Toolbar */}
+            <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold uppercase tracking-widest text-gray-500">🎯 나의 비전</span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight mb-2">
-              {goalInfo.title}
-            </h1>
-            <p className="text-blue-400 font-semibold text-sm mb-3">{quote}</p>
-            <Link
-              href="/job"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 hover:border-indigo-400/50 transition-all"
-            >
-              🚀 취업준비 바로가기
-            </Link>
-
-            {/* Subjects */}
-            <div className="flex flex-wrap gap-2">
-              {goalInfo.subjects.map((subject, i) => (
-                <span
-                  key={i}
-                  className="text-xs px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25 font-medium"
+              <button
+                onClick={() => setEditing(!editing)}
+                className="text-xs text-gray-600 hover:text-gray-400 transition-colors px-2 py-0.5 rounded border border-gray-700 hover:border-gray-600"
+              >
+                {editing ? "✓ 저장" : "✏️ 편집"}
+              </button>
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="text-xs text-gray-600 hover:text-gray-400 transition-colors px-2 py-0.5 rounded border border-gray-700 hover:border-gray-600"
+              >
+                🖼 배경
+              </button>
+              {bgImage && (
+                <button
+                  onClick={removeImage}
+                  className="text-xs text-red-600 hover:text-red-400 transition-colors px-2 py-0.5 rounded border border-red-900 hover:border-red-700"
                 >
-                  {subject}
-                </span>
-              ))}
-              <span className={`text-xs px-2.5 py-1 rounded-full ${config.bg} ${config.color} border ${config.border} font-medium`}>
-                {config.emoji} {goalInfo.difficulty}
-              </span>
-            </div>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full lg:w-auto">
-            {/* D-Day */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[90px]">
-              <div className="text-2xl font-black text-white">D-{daysLeft}</div>
-              <div className="text-xs text-gray-400 mt-0.5">목표까지</div>
+                  ✕ 제거
+                </button>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             </div>
 
-            {/* Total Hours */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[90px]">
-              <div className="text-2xl font-black text-amber-400">{goalInfo.totalHours}h</div>
-              <div className="text-xs text-gray-400 mt-0.5">총 학습량</div>
-            </div>
-
-            {/* Daily Hours */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[90px]">
-              <div className="text-2xl font-black text-green-400">{goalInfo.dailyHours}h</div>
-              <div className="text-xs text-gray-400 mt-0.5">하루 목표</div>
-            </div>
-
-            {/* Weeks */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[90px]">
-              <div className="text-2xl font-black text-purple-400">{weeksLeft}주</div>
-              <div className="text-xs text-gray-400 mt-0.5">예상 기간</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Progress bar + End date */}
-        <div className="mt-4">
-          <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-            <span>진행률 {goalInfo.progressPercent}%</span>
-            <span>🏁 목표 완성일: {endDateStr}</span>
-          </div>
-          <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
-              style={{ width: `${Math.max(goalInfo.progressPercent, 2)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Study Tips */}
-        {studyTips && studyTips.length > 0 && (
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {studyTips.slice(0, 3).map((tip, i) => (
-              <div key={i} className="flex-shrink-0 bg-gray-800/40 border border-gray-700/50 rounded-lg px-3 py-1.5">
-                <p className="text-xs text-gray-400 whitespace-nowrap">
-                  <span className="text-yellow-400 mr-1">💡</span>
-                  {tip}
-                </p>
+            {/* Editable text */}
+            {editing ? (
+              <textarea
+                value={visionText}
+                onChange={(e) => saveVisionText(e.target.value)}
+                placeholder={"나의 꿈과 목표를 적어보세요\n예) 2026년 정보처리기사 합격 후 개발자로 취업\n매일 2시간씩 꾸준히 공부해서 반드시 달성한다!"}
+                className="flex-1 w-full bg-gray-800/70 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition resize-none"
+                style={{ minHeight: 100 }}
+                autoFocus
+              />
+            ) : (
+              <div onClick={() => setEditing(true)} className="cursor-text group flex-1">
+                {visionText ? (
+                  <p className="text-xl font-bold text-white leading-relaxed whitespace-pre-wrap">{visionText}</p>
+                ) : (
+                  <p className="text-gray-700 text-sm italic group-hover:text-gray-500 transition-colors">
+                    ✏️ 클릭해서 나의 비전·목표를 입력하세요
+                  </p>
+                )}
               </div>
-            ))}
+            )}
+
+            {/* AI goal tags */}
+            {goalInfo && (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-blue-400 font-semibold text-sm">{quote}</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {goalInfo.subjects.map((s, i) => (
+                    <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25">
+                      {s}
+                    </span>
+                  ))}
+                  {config && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${config.bg} ${config.color} border ${config.border}`}>
+                      {config.emoji} {goalInfo.difficulty}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Study tips */}
+            {studyTips && studyTips.length > 0 && (
+              <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                {studyTips.slice(0, 3).map((tip, i) => (
+                  <div key={i} className="flex-shrink-0 bg-gray-800/40 border border-gray-700/50 rounded-lg px-3 py-1.5">
+                    <p className="text-xs text-gray-400 whitespace-nowrap">
+                      <span className="text-yellow-400 mr-1">💡</span>{tip}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Right: Stats */}
+          {goalInfo && (
+            <div className="flex flex-col gap-3 shrink-0">
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: `D-${daysLeft}`,           label: "목표까지",  color: "text-white" },
+                  { value: `${goalInfo.totalHours}h`,  label: "총 학습량", color: "text-amber-400" },
+                  { value: `${goalInfo.dailyHours}h`,  label: "하루 목표", color: "text-green-400" },
+                  { value: `${weeksLeft}주`,            label: "예상 기간", color: "text-purple-400" },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[80px]">
+                    <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>{goalInfo.progressPercent}%</span>
+                  <span>🏁 {endDateStr}</span>
+                </div>
+                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
+                    style={{ width: `${Math.max(goalInfo.progressPercent, 2)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-4 flex items-center gap-3 flex-wrap">
+          <Link
+            href="/job"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 transition-all"
+          >
+            🚀 취업준비
+          </Link>
+          {!goalInfo && (
+            <p className="text-xs text-gray-600">오른쪽 패널에서 목표를 입력하고 플랜을 생성하세요</p>
+          )}
+        </div>
       </div>
     </div>
   );

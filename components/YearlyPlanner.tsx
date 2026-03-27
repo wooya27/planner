@@ -60,7 +60,7 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
   const activeMonths = Object.keys(eventsByMonth).map(Number).sort((a, b) => a - b);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4" style={{ minHeight: 280 }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -114,7 +114,7 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
                 </div>
 
                 {/* Events */}
-                <div className="p-2 space-y-1.5 min-h-[60px]">
+                <div className="p-2 space-y-1.5 min-h-[160px]">
                   {monthEvents.length === 0 ? (
                     <div className="text-xs text-gray-700 text-center py-2 italic">-</div>
                   ) : (
