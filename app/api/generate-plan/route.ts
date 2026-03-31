@@ -2,7 +2,6 @@ import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 import { PlanRequest, StudyPlan } from "@/types/plan";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const today = new Date().toISOString().split("T")[0];
 
 const SYSTEM_PROMPT = `당신은 ADHD 학습자를 위한 전문 스터디 플래너입니다.
@@ -86,6 +85,7 @@ const SYSTEM_PROMPT = `당신은 ADHD 학습자를 위한 전문 스터디 플�
 - 오늘 날짜: ${today}`;
 
 export async function POST(req: NextRequest) {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
     const body: PlanRequest = await req.json();
 
