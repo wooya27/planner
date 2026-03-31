@@ -1,13 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { StudyPlan, PlanRequest, YearlyEvent } from "@/types/plan";
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { StudyPlan, PlanRequest, WeeklyPlan, DayPlan } from "@/types/plan";
 import VisionBoard from "@/components/VisionBoard";
 import TodayTasks from "@/components/TodayTasks";
 import WeeklyPlanner from "@/components/WeeklyPlanner";
 import GoalPanel from "@/components/GoalPanel";
-import YearlyPlanner from "@/components/YearlyPlanner";
-import ExamSearch from "@/components/ExamSearch";
+
+const DAY_ORDER = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DAY_KR_MAP: Record<string,string> = {
+  Sunday:"일요일", Monday:"월요일", Tuesday:"화요일", Wednesday:"수요일",
+  Thursday:"목요일", Friday:"금요일", Saturday:"토요일",
+};
+
+function mergeWeeklyPlans(a: WeeklyPlan, b: WeeklyPlan): WeeklyPlan {
+  const merged = new Map<string, DayPlan>();
+  for (const dayName of DAY_ORDER) {
+    const da = a.days.find((d) => d.day === dayName);
+    const db = b.days.find((d) => d.day === dayName);
+    const sessions = [...(da?.sessions ?? []), ...(db?.sessions ?? [])];
+    if (sessions.length > 0) {
+      merged.set(dayName, {
+        day: dayName,
+        dayKr: da?.dayKr ?? db?.dayKr ?? DAY_KR_MAP[dayName],
+        sessions,
+        totalMinutes: sessions.reduce((s, sess) => s + sess.duration, 0),
+      });
+    }
+  }
+  return {
+    weekNumber: a.weekNumber,
+    theme: a.theme,
+    days: DAY_ORDER.map((d) => merged.get(d)).filter(Boolean) as DayPlan[],
+  };
+}
 
 export default function Home() {
   const [plan, setPlan]                   = useState<StudyPlan | null>(null);
@@ -16,28 +43,39 @@ export default function Home() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError]                 = useState<string | null>(null);
   const [syncStatus, setSyncStatus]       = useState<"idle" | "saving" | "saved" | "error">("idle");
-  const [examEvents, setExamEvents]       = useState<YearlyEvent[]>([]);
+  const [roadmapWeek, setRoadmapWeek]       = useState<WeeklyPlan | null>(null);
+  const [roadmapWeekNum, setRoadmapWeekNum] = useState(0);
+  const [roadmapIniting, setRoadmapIniting] = useState(false);
+
+  const displayWeeklyPlan = useMemo(() => {
+    if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
+    return roadmapWeek ?? plan?.weeklyPlan ?? null;
+  }, [roadmapWeek, plan]);
 
   // ── 앱 시작 시 Google Sheets에서 플랜 불러오기 ──────────────────────────
   useEffect(() => {
     async function loadFromSheets() {
       try {
-        const res = await fetch("/api/load-plan");
-        if (!res.ok) return;
-        const data = await res.json();
+        const [planRes, roadmapRes] = await Promise.allSettled([
+          fetch("/api/load-plan").then((r) => r.json()),
+          fetch("/api/roadmap").then((r) => r.json()),
+        ]);
 
-        if (data.plan) {
-          setPlan(data.plan);
-        }
-        // visionText는 Sheets에 저장된 값이 있으면 localStorage를 업데이트
-        if (data.visionText && typeof window !== "undefined") {
-          const local = localStorage.getItem("visionText");
-          if (!local) {
-            localStorage.setItem("visionText", data.visionText);
+        if (planRes.status === "fulfilled") {
+          const data = planRes.value;
+          if (data.plan) setPlan(data.plan);
+          if (data.visionText && typeof window !== "undefined") {
+            const local = localStorage.getItem("visionText");
+            if (!local) localStorage.setItem("visionText", data.visionText);
           }
         }
+
+        if (roadmapRes.status === "fulfilled" && roadmapRes.value.weeklyPlan) {
+          setRoadmapWeek(roadmapRes.value.weeklyPlan);
+          setRoadmapWeekNum(roadmapRes.value.currentWeek);
+        }
       } catch {
-        // Sheets 미설정 시 조용히 무시 (localStorage 폴백)
+        // Sheets 미설정 시 조용히 무시
       } finally {
         setIsInitialLoad(false);
       }
@@ -67,6 +105,21 @@ export default function Home() {
       setTimeout(() => setSyncStatus("idle"), 3000);
     }
   }
+
+  const handleInitRoadmap = async () => {
+    setRoadmapIniting(true);
+    try {
+      await fetch("/api/roadmap", { method: "POST" });
+      const res = await fetch("/api/roadmap");
+      const data = await res.json();
+      if (data.weeklyPlan) {
+        setRoadmapWeek(data.weeklyPlan);
+        setRoadmapWeekNum(data.currentWeek);
+      }
+    } catch { /* ignore */ } finally {
+      setRoadmapIniting(false);
+    }
+  };
 
   const handleGenerate = async (request: PlanRequest) => {
     setIsLoading(true);
@@ -105,7 +158,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen text-white">
       <div className="max-w-[1600px] mx-auto p-4 space-y-4">
 
         {/* Error toast */}
@@ -130,76 +183,106 @@ export default function Home() {
           </div>
         )}
 
-        {/* TOP: Vision Board */}
-        <VisionBoard
-          goalInfo={plan?.goalInfo}
-          studyTips={plan?.studyTips}
-          onVisionTextChange={(text) => {
-            // visionText 변경 시 Sheets에도 동기화
-            if (plan) {
-              fetch("/api/save-plan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan, visionText: text }),
-              }).catch(() => {});
-            }
-          }}
-        />
+        {/* 메인: [나의비전+오늘할일+플랜입력+시험검색] [위클리플래너] */}
+        <div className="grid grid-cols-1 lg:grid-cols-[540px_1fr] gap-4 items-start" style={{ minHeight: "800px" }}>
 
-        {/* MIDDLE: Today + Weekly + Input/Goal Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_240px] gap-4 items-stretch" style={{ minHeight: "420px" }}>
-
-          {/* Left: Today Tasks + Exam Search */}
-          <div className="flex flex-col gap-3 h-full">
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col flex-1">
+          {/* 좌측: 나의비전 → 오늘할일+플랜입력 나란히 → 시험검색 */}
+          <div className="flex flex-col gap-3">
+            <VisionBoard
+              goalInfo={plan?.goalInfo}
+              studyTips={plan?.studyTips}
+              onVisionTextChange={(text) => {
+                if (plan) {
+                  fetch("/api/save-plan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ plan, visionText: text }),
+                  }).catch(() => {});
+                }
+              }}
+            />
+            <div className="grid grid-cols-2 gap-3 items-stretch">
               {plan ? (
                 <TodayTasks tasks={plan.todayTasks} />
               ) : (
-                <div className="flex flex-col">
-                  <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">오늘 할 일</h2>
-                  <div className="flex items-center justify-center py-8">
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col">
+                  <div className="pb-3 mb-3 border-b border-gray-800">
+                    <p className="text-xs text-gray-500 mb-0.5">{new Date().getFullYear()}년</p>
+                    <p className="text-xl font-black text-white leading-none">
+                      {new Date().getMonth() + 1}월 {new Date().getDate()}일
+                      <span className="text-base font-semibold text-blue-400 ml-1.5">
+                        {["일","월","화","수","목","금","토"][new Date().getDay()]}요일
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
                     <p className="text-gray-700 text-sm text-center">플랜 생성 후<br />오늘 할 일이 표시됩니다</p>
                   </div>
                 </div>
               )}
+              <GoalPanel
+                goalInfo={plan?.goalInfo ?? null}
+                onGenerate={handleGenerate}
+                isLoading={isLoading}
+              />
             </div>
-            <ExamSearch onEventsChange={setExamEvents} />
+            <Link
+              href="/yearly"
+              className="flex items-center justify-between bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-4 py-3 transition-colors group"
+            >
+              <span className="text-xs text-gray-400 group-hover:text-white transition-colors">📅 시험 일정 검색 · 년간 플래너</span>
+              <span className="text-gray-600 group-hover:text-gray-400 transition-colors">→</span>
+            </Link>
           </div>
 
-          {/* Center: Weekly Planner */}
+          {/* 우측: 위클리 플래너 */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full flex flex-col">
-            {plan ? (
-              <WeeklyPlanner weeklyPlan={plan.weeklyPlan} />
-            ) : (
-              <div className="flex flex-col h-full">
-                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">위클리 플래너</h2>
-                {isLoading ? (
-                  <div className="flex-1 flex flex-col items-center justify-center gap-3">
-                    <div className="w-10 h-10 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin" />
-                    <div className="text-center">
-                      <p className="text-white text-sm font-semibold">AI가 플랜 작성 중...</p>
-                      <p className="text-gray-600 text-xs mt-1">에빙하우스 복습 주기 적용 중</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-gray-700 text-sm text-center">플랜 생성 후<br />위클리 플래너가 표시됩니다</p>
-                  </div>
+            <div className="flex items-center justify-between mb-2 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                {roadmapWeek && (
+                  <span className="text-xs text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
+                    📅 로드맵 {roadmapWeekNum}주차 / 4주차
+                  </span>
                 )}
+              </div>
+              <button
+                onClick={handleInitRoadmap}
+                disabled={roadmapIniting}
+                className="text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {roadmapIniting ? "저장 중..." : roadmapWeek ? "🔄 로드맵 갱신" : "📅 4주 로드맵 저장"}
+              </button>
+            </div>
+
+            {displayWeeklyPlan ? (
+              <WeeklyPlanner weeklyPlan={displayWeeklyPlan} />
+            ) : isLoading ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3">
+                <div className="w-10 h-10 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin" />
+                <div className="text-center">
+                  <p className="text-white text-sm font-semibold">AI가 플랜 작성 중...</p>
+                  <p className="text-gray-600 text-xs mt-1">에빙하우스 복습 주기 적용 중</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-700 text-sm text-center">위 버튼으로 로드맵을 저장하거나<br />오른쪽에서 AI 플랜을 생성하세요</p>
               </div>
             )}
           </div>
-
-          {/* Right: Input + Goal Panel */}
-          <GoalPanel
-            goalInfo={plan?.goalInfo ?? null}
-            onGenerate={handleGenerate}
-            isLoading={isLoading}
-          />
         </div>
 
-        {/* BOTTOM: Yearly Planner */}
-        <YearlyPlanner events={plan ? [...plan.yearlyEvents, ...examEvents] : examEvents} />
+        {/* BOTTOM: 년간 플래너 링크 */}
+        <Link
+          href="/yearly"
+          className="flex items-center justify-between w-full bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-5 py-4 transition-colors group"
+        >
+          <div>
+            <p className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">📅 년간 플래너</p>
+            <p className="text-xs text-gray-500 mt-0.5">시험 일정 검색 및 연간 학습 로드맵 보기</p>
+          </div>
+          <span className="text-gray-600 group-hover:text-gray-400 transition-colors text-lg">→</span>
+        </Link>
 
         <div className="text-center text-xs text-gray-700 pb-2">
           복습 주기: 1일 → 3일 → 7일 → 14일 → 30일 (에빙하우스 망각곡선)

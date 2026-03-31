@@ -8,12 +8,18 @@ interface ExamSearchProps {
   onEventsChange: (events: YearlyEvent[]) => void;
 }
 
+// 한국 시간(KST) 기준 오늘 날짜 문자열 반환 (YYYY-MM-DD)
+function getTodayKST(): Date {
+  const kst = new Date(new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" }));
+  return kst;
+}
+
 function scheduleToEvents(exam: Exam, schedule: ExamSchedule): YearlyEvent[] {
-  const today = new Date();
+  const today = getTodayKST();
   const events: YearlyEvent[] = [];
 
   const toDDay = (dateStr: string) => {
-    const d = new Date(dateStr);
+    const d = new Date(dateStr); // YYYY-MM-DD → UTC 자정 → KST 기준과 동일하게 비교
     return Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   };
 
@@ -106,7 +112,7 @@ export default function ExamSearch({ onEventsChange }: ExamSearchProps) {
     setShowSuggestions(false);
     setQuery("");
     // 가장 가까운 일정 자동 선택
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
     const upcoming = exam.schedules.find((s) => s.examDate >= today) ?? exam.schedules[exam.schedules.length - 1];
 
     // 이미 추가된 경우 중복 방지
@@ -160,7 +166,7 @@ export default function ExamSearch({ onEventsChange }: ExamSearchProps) {
         {showSuggestions && (
           <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-30 overflow-hidden">
             {suggestions.map((exam) => {
-              const today = new Date().toISOString().split("T")[0];
+              const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
               const upcoming = exam.schedules.find((s) => s.examDate >= today);
               return (
                 <button

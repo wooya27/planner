@@ -79,10 +79,9 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="relative overflow-x-auto">
-        <div className="flex gap-3 min-w-max pb-2">
-          {MONTHS.map((monthLabel, i) => {
+      {/* 4×3 그리드 (1~4월 / 5~8월 / 9~12월) */}
+      <div className="grid grid-cols-3 gap-3">
+        {MONTHS.map((monthLabel, i) => {
             const month = i + 1;
             const monthEvents = eventsByMonth[month] || [];
             const isPast = month < currentMonth;
@@ -91,7 +90,7 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
             return (
               <div
                 key={month}
-                className={`flex-shrink-0 w-36 rounded-lg border transition-all ${
+                className={`rounded-lg border transition-all ${
                   isCurrent
                     ? "border-blue-500/40 bg-blue-500/5"
                     : isPast
@@ -126,11 +125,11 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
                       return (
                         <div
                           key={event.id}
-                          className={`group relative px-2 py-1.5 rounded border text-xs transition-all hover:scale-105 cursor-default ${cfg.bg} ${cfg.border}`}
+                          className={`group px-2 py-1.5 rounded border text-xs transition-all cursor-default ${cfg.bg} ${cfg.border}`}
                         >
                           <div className="flex items-center gap-1">
                             <span>{cfg.emoji}</span>
-                            <span className={`font-medium truncate ${cfg.text}`}>{event.title}</span>
+                            <span className={`font-medium break-words leading-tight ${cfg.text}`}>{event.title}</span>
                           </div>
                           <div className="text-gray-500 text-xs mt-0.5">
                             {event.month}월 {event.day}일
@@ -138,10 +137,11 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
                               <span className="ml-1 text-amber-400">D-{event.dDay}</span>
                             )}
                           </div>
-
-                          {/* Tooltip */}
-                          <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-20 w-48 bg-gray-800 border border-gray-700 rounded-lg p-2.5 shadow-xl">
-                            <p className="text-gray-300 text-xs leading-relaxed">{event.description}</p>
+                          {/* 호버 시 인라인으로 펼쳐지는 설명 */}
+                          <div className="max-h-0 overflow-hidden group-hover:max-h-24 transition-all duration-200">
+                            <p className="text-gray-400 text-xs mt-1 leading-relaxed whitespace-normal break-words border-t border-gray-700/50 pt-1">
+                              {event.description}
+                            </p>
                           </div>
                         </div>
                       );
@@ -151,7 +151,6 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
               </div>
             );
           })}
-        </div>
       </div>
     </div>
   );

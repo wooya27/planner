@@ -1,24 +1,71 @@
 @import "tailwindcss";
 
-:root {
-  --background: #030712;
-  --foreground: #f9fafb;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ── 밝은 종이 노트 팔레트 ─────────────────────────────
+     다크모드 관례(gray-950=가장 어둠)를 라이트로 반전:
+     gray-950 → 연한 크림(카드 안쪽)
+     gray-900 → 크림(카드 배경)
+     gray-800 → 연한 베이지(테두리)
+     gray-700 → 중간 베이지
+     gray-600 → 따뜻한 브라운 (disabled)
+     gray-500 → 보조 텍스트
+     gray-400 → 본문 텍스트
+     gray-300 → 강조 텍스트
+     white   → 잉크(#1c1208) — 헤딩용
+  ─────────────────────────────────────────────────────── */
+  --color-white:    #1c1208;   /* 헤딩: 다크 잉크 */
+
+  --color-gray-50:  #160e06;
+  --color-gray-100: #241808;
+  --color-gray-200: #38280e;
+  --color-gray-300: #503820;
+  --color-gray-400: #705040;   /* 본문 텍스트 */
+  --color-gray-500: #907060;   /* 보조 텍스트 */
+  --color-gray-600: #b09080;   /* muted */
+  --color-gray-700: #ccc0b0;   /* 강한 테두리 */
+  --color-gray-800: #ddd4c4;   /* 기본 테두리 / input 배경 */
+  --color-gray-900: #eee8dc;   /* 카드 배경 */
+  --color-gray-950: #f5f0e8;   /* 섹션 배경 */
+
+  /* ── accent 색상: 밝은 배경에서 잘 보이도록 진하게 ── */
+  --color-blue-300:   #1462a8;
+  --color-blue-400:   #1050a0;
+  --color-blue-500:   #0e4898;
+  --color-amber-300:  #a05c00;
+  --color-amber-400:  #8a4e00;
+  --color-amber-500:  #7a4400;
+  --color-green-300:  #186830;
+  --color-green-400:  #145828;
+  --color-green-500:  #104820;
+  --color-purple-300: #5818a0;
+  --color-purple-400: #4a1490;
+  --color-purple-500: #3e1080;
+  --color-purple-600: #781dc8;
+  --color-red-300:    #b01818;
+  --color-red-400:    #981010;
 }
 
+/* ── 격자 노트 배경 ────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: #faf6ee;
+  background-image:
+    linear-gradient(rgba(160, 138, 90, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160, 138, 90, 0.14) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: #3a2818;
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
 
-/* Hide scrollbar but keep scrolling */
+/* ── 카드: 종이 느낌 그림자 ──────────────────────────── */
+.rounded-xl,
+.rounded-lg {
+  box-shadow: 0 1px 4px rgba(100, 80, 40, 0.12), 0 0 0 1px rgba(160, 138, 90, 0.1);
+}
+
+/* ── 스크롤바 숨김 ───────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -38,30 +38,39 @@ export default function TodayTasks({ tasks }: TodayTasksProps) {
   const progress =
     totalMinutes > 0 ? (completedMinutes / totalMinutes) * 100 : 0;
 
-  const today = new Date();
-  const dateStr = `${today.getMonth() + 1}월 ${today.getDate()}일 ${["일", "월", "화", "수", "목", "금", "토"][today.getDay()]}요일`;
+  const today = new Date(new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" }));
+  const month = today.getMonth() + 1;
+  const date  = today.getDate();
+  const dayKr = ["일", "월", "화", "수", "목", "금", "토"][today.getDay()];
+  const year  = today.getFullYear();
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full flex flex-col">
-      {/* Header */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-            오늘 할 일
-          </h2>
-          <span className="text-xs text-gray-500">{dateStr}</span>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col min-h-0">
+      {/* 날짜 헤더 */}
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-800">
+        <div>
+          <p className="text-xs text-gray-500 mb-0.5">{year}년</p>
+          <p className="text-xl font-black text-white leading-none">
+            {month}월 {date}일
+            <span className="text-base font-semibold text-blue-400 ml-1.5">{dayKr}요일</span>
+          </p>
         </div>
-        <div className="text-xs text-gray-500 mb-3">
-          {completedIds.size}/{tasks.length}개 완료 •{" "}
-          {Math.floor(totalMinutes / 60)}시간 {totalMinutes % 60}분
+        <div className="text-right">
+          <p className="text-xs text-gray-500">오늘 할 일</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {completedIds.size}/{tasks.length}개 •{" "}
+            {Math.floor(totalMinutes / 60) > 0 ? `${Math.floor(totalMinutes / 60)}h ` : ""}
+            {totalMinutes % 60 > 0 ? `${totalMinutes % 60}m` : ""}
+          </p>
         </div>
-        {/* Progress bar */}
-        <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden mb-3 flex-shrink-0">
+        <div
+          className="h-full bg-blue-500 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       {/* Tasks */}

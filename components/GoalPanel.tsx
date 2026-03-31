@@ -150,19 +150,19 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
                 <button key={d.key} type="button" onClick={() => toggleDay(d.key)}
                   className={`py-2 rounded-lg text-xs font-bold transition-all ${
                     studyDays.includes(d.key)
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                      ? "bg-amber-800 text-amber-50 shadow-lg shadow-amber-800/20"
                       : "bg-gray-800 text-gray-600 border border-gray-700 hover:border-gray-600"
                   }`}>
                   {d.label}
                 </button>
               ))}
-              <div className="py-2 rounded-lg text-xs font-bold bg-purple-600/20 text-purple-400 border border-purple-500/30 text-center" title="피드백의 날">
+              <div className="py-2 rounded-lg text-xs font-bold bg-amber-900/15 text-amber-800 border border-amber-700/30 text-center" title="피드백의 날">
                 일
               </div>
             </div>
             <p className="text-xs text-gray-600 mt-1.5 flex justify-between">
-              <span>🟣 일요일 = 피드백·평가의 날</span>
-              <span className="text-blue-400">주 {studyDays.length}일</span>
+              <span>🟤 일요일 = 피드백·평가의 날</span>
+              <span className="text-amber-700">주 {studyDays.length}일</span>
             </p>
           </div>
 
