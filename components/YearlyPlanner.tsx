@@ -116,7 +116,10 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
                 {/* Events */}
                 <div className="p-2 space-y-1.5 min-h-[160px]">
                   {monthEvents.length === 0 ? (
-                    <div className="text-xs text-gray-700 text-center py-2 italic">-</div>
+                    <div className="flex flex-col items-center justify-center h-full min-h-[120px] gap-1">
+                      <div className="w-6 h-px bg-gray-800" />
+                      <span className="text-xs text-gray-700">일정 없음</span>
+                    </div>
                   ) : (
                     monthEvents.map((event) => {
                       const cfg = eventTypeConfig[event.type];

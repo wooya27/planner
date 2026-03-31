@@ -199,18 +199,7 @@ export default function Home() {
         </div>
 
         {/* BOTTOM: Yearly Planner */}
-        {plan ? (
-          <YearlyPlanner events={[...plan.yearlyEvents, ...examEvents]} />
-        ) : examEvents.length > 0 ? (
-          <YearlyPlanner events={examEvents} />
-        ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4" style={{ minHeight: 280 }}>
-            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">년간 플래너</h2>
-            <div className="flex items-center justify-center h-40">
-              <p className="text-gray-700 text-sm">위 시험 검색으로 일정을 추가하거나, 플랜을 생성하세요</p>
-            </div>
-          </div>
-        )}
+        <YearlyPlanner events={plan ? [...plan.yearlyEvents, ...examEvents] : examEvents} />
 
         <div className="text-center text-xs text-gray-700 pb-2">
           복습 주기: 1일 → 3일 → 7일 → 14일 → 30일 (에빙하우스 망각곡선)
