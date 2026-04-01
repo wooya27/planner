@@ -46,11 +46,30 @@ export default function Home() {
   const [roadmapWeek, setRoadmapWeek]       = useState<WeeklyPlan | null>(null);
   const [roadmapWeekNum, setRoadmapWeekNum] = useState(0);
   const [roadmapIniting, setRoadmapIniting] = useState(false);
+  const [registrationTasks, setRegistrationTasks] = useState<import("@/types/plan").Task[]>([]);
 
   const displayWeeklyPlan = useMemo(() => {
     if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
     return roadmapWeek ?? plan?.weeklyPlan ?? null;
   }, [roadmapWeek, plan]);
+
+  const todayDayName = DAY_ORDER[new Date().getDay()];
+
+  const todayTasks = useMemo(() => {
+    const roadmapTasks = roadmapWeek
+      ? (roadmapWeek.days.find((d) => d.day === todayDayName)?.sessions ?? [])
+          .filter((s) => s.type !== "rest")
+          .map((s, i) => ({
+            id: `roadmap-${i}`,
+            title: s.topic,
+            duration: s.duration,
+            completed: false,
+            type: s.type as "study" | "review" | "practice",
+            subject: "로드맵",
+          }))
+      : [];
+    return [...registrationTasks, ...roadmapTasks, ...(plan?.todayTasks ?? [])];
+  }, [roadmapWeek, plan, todayDayName, registrationTasks]);
 
   // ── 앱 시작 시 Google Sheets에서 플랜 불러오기 ──────────────────────────
   useEffect(() => {
@@ -74,6 +93,30 @@ export default function Home() {
           setRoadmapWeek(roadmapRes.value.weeklyPlan);
           setRoadmapWeekNum(roadmapRes.value.currentWeek);
         }
+
+        // 저장된 시험 접수 기간 체크
+        try {
+          const { EXAM_DB } = await import("@/data/exams");
+          const examRes = await fetch("/api/exam-search").then((r) => r.json());
+          const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+          const regTasks: import("@/types/plan").Task[] = [];
+          for (const { examId, round } of (examRes.items ?? [])) {
+            const exam = EXAM_DB.find((e) => e.id === examId);
+            const schedule = exam?.schedules.find((s) => s.round === round);
+            if (!schedule) continue;
+            if (todayStr >= schedule.registrationStart && todayStr <= schedule.registrationEnd) {
+              regTasks.push({
+                id: `reg-${examId}-${round}`,
+                title: `📋 ${exam!.name} ${round.replace(/\d{4}년 /, "")} 원서접수 (~${schedule.registrationEnd})`,
+                duration: 30,
+                completed: false,
+                type: "study",
+                subject: "접수",
+              });
+            }
+          }
+          if (regTasks.length > 0) setRegistrationTasks(regTasks);
+        } catch { /* ignore */ }
       } catch {
         // Sheets 미설정 시 조용히 무시
       } finally {
@@ -201,20 +244,22 @@ export default function Home() {
                 }
               }}
             />
+            <div className="flex items-center justify-between">
+              <p className="text-lg font-black text-white">
+                {new Date().getFullYear()}년&nbsp;
+                {new Date().getMonth() + 1}월&nbsp;
+                {new Date().getDate()}일&nbsp;
+                <span className="text-blue-400">{["일","월","화","수","목","금","토"][new Date().getDay()]}요일</span>
+              </p>
+              <Link href="/yearly" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
+                📅 년간플래너
+              </Link>
+            </div>
             <div className="grid grid-cols-2 gap-3 items-stretch">
-              {plan ? (
-                <TodayTasks tasks={plan.todayTasks} />
+              {todayTasks.length > 0 ? (
+                <TodayTasks tasks={todayTasks} />
               ) : (
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col">
-                  <div className="pb-3 mb-3 border-b border-gray-800">
-                    <p className="text-xs text-gray-500 mb-0.5">{new Date().getFullYear()}년</p>
-                    <p className="text-xl font-black text-white leading-none">
-                      {new Date().getMonth() + 1}월 {new Date().getDate()}일
-                      <span className="text-base font-semibold text-blue-400 ml-1.5">
-                        {["일","월","화","수","목","금","토"][new Date().getDay()]}요일
-                      </span>
-                    </p>
-                  </div>
                   <div className="flex-1 flex items-center justify-center">
                     <p className="text-gray-700 text-sm text-center">플랜 생성 후<br />오늘 할 일이 표시됩니다</p>
                   </div>
@@ -226,13 +271,6 @@ export default function Home() {
                 isLoading={isLoading}
               />
             </div>
-            <Link
-              href="/yearly"
-              className="flex items-center justify-between bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-4 py-3 transition-colors group"
-            >
-              <span className="text-xs text-gray-400 group-hover:text-white transition-colors">📅 시험 일정 검색 · 년간 플래너</span>
-              <span className="text-gray-600 group-hover:text-gray-400 transition-colors">→</span>
-            </Link>
           </div>
 
           {/* 우측: 위클리 플래너 */}
@@ -248,7 +286,7 @@ export default function Home() {
               <button
                 onClick={handleInitRoadmap}
                 disabled={roadmapIniting}
-                className="text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-xs font-semibold bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {roadmapIniting ? "저장 중..." : roadmapWeek ? "🔄 로드맵 갱신" : "📅 4주 로드맵 저장"}
               </button>
@@ -272,19 +310,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* BOTTOM: 년간 플래너 링크 */}
-        <Link
-          href="/yearly"
-          className="flex items-center justify-between w-full bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-5 py-4 transition-colors group"
-        >
-          <div>
-            <p className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">📅 년간 플래너</p>
-            <p className="text-xs text-gray-500 mt-0.5">시험 일정 검색 및 연간 학습 로드맵 보기</p>
-          </div>
-          <span className="text-gray-600 group-hover:text-gray-400 transition-colors text-lg">→</span>
-        </Link>
-
-        <div className="text-center text-xs text-gray-700 pb-2">
+<div className="text-center text-xs text-gray-700 pb-2">
           복습 주기: 1일 → 3일 → 7일 → 14일 → 30일 (에빙하우스 망각곡선)
         </div>
       </div>

@@ -32,6 +32,7 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
   const [dailyHours, setDailyHours] = useState(goalInfo ? String(goalInfo.dailyHours) : "");
   const [targetDate, setTargetDate] = useState("");
   const [studyDays, setStudyDays]   = useState<string[]>(["Monday","Tuesday","Wednesday","Thursday","Friday"]);
+  const [studyMode, setStudyMode]   = useState<"general" | "certification">("general");
 
   const [suggestions, setSuggestions]         = useState<Exam[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -71,7 +72,7 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!goal || !dailyHours || studyDays.length === 0) return;
-    onGenerate({ goal, dailyHours: Number(dailyHours), studyDays, targetExamDate: targetDate || undefined });
+    onGenerate({ goal, dailyHours: Number(dailyHours), studyDays, targetExamDate: targetDate || undefined, studyMode });
   };
 
   const upcomingSchedule = selectedExam ? getUpcomingSchedule(selectedExam) : null;
@@ -87,6 +88,27 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
       {/* ── Form ── */}
       <div>
         <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">✏️ 플랜 입력</h2>
+
+        {/* 학습 모드 토글 */}
+        <div className="flex gap-1 mb-3 bg-gray-800 rounded-lg p-0.5">
+          <button type="button" onClick={() => setStudyMode("general")}
+            className={`flex-1 text-xs font-semibold py-1.5 rounded-md transition-all ${
+              studyMode === "general"
+                ? "bg-amber-800 text-amber-50"
+                : "text-gray-500 hover:text-gray-300"
+            }`}>
+            📖 일반 공부
+          </button>
+          <button type="button" onClick={() => setStudyMode("certification")}
+            className={`flex-1 text-xs font-semibold py-1.5 rounded-md transition-all ${
+              studyMode === "certification"
+                ? "bg-amber-800 text-amber-50"
+                : "text-gray-500 hover:text-gray-300"
+            }`}>
+            🏆 자격증 공부ver
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-3">
 
           {/* Goal */}
@@ -118,12 +140,12 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
 
           {/* Exam schedule auto-fill */}
           {selectedExam && upcomingSchedule && (
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-2.5">
-              <p className="text-xs font-semibold text-blue-300 mb-1">📅 {upcomingSchedule.round} 자동입력</p>
-              <div className="space-y-0.5 text-xs text-gray-400">
-                <p>접수: <span className="text-white">{upcomingSchedule.registrationStart} ~ {upcomingSchedule.registrationEnd}</span></p>
-                <p>시험: <span className="text-white">{upcomingSchedule.examDate}</span></p>
-                <p>발표: <span className="text-white">{upcomingSchedule.resultDate}</span></p>
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2.5">
+              <p className="text-xs font-semibold text-gray-300 mb-1">📅 {upcomingSchedule.round} 자동입력</p>
+              <div className="space-y-0.5 text-xs text-gray-500">
+                <p>접수: <span className="text-gray-300">{upcomingSchedule.registrationStart} ~ {upcomingSchedule.registrationEnd}</span></p>
+                <p>시험: <span className="text-gray-300">{upcomingSchedule.examDate}</span></p>
+                <p>발표: <span className="text-gray-300">{upcomingSchedule.resultDate}</span></p>
               </div>
               {selectedExam.schedules.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-blue-500/20 flex flex-wrap gap-1">

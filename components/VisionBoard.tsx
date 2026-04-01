@@ -204,7 +204,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
         <div className="mt-4 flex items-center gap-3 flex-wrap">
           <Link
             href="/job"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600/30 transition-all"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all"
           >
             🚀 취업준비
           </Link>

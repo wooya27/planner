@@ -61,4 +61,5 @@ export interface PlanRequest {
   dailyHours: number;
   studyDays: string[];     // e.g. ["Monday","Tuesday","Thursday"]
   targetExamDate?: string;
+  studyMode?: "general" | "certification";
 }

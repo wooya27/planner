@@ -37,7 +37,10 @@ export default function YearlyPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-white">년간 플래너</h1>
-            <p className="text-xs text-gray-500 mt-0.5">시험 일정 검색 및 연간 학습 로드맵</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {new Date().getFullYear()}년 {new Date().getMonth() + 1}월 {new Date().getDate()}일&nbsp;
+              {["일","월","화","수","목","금","토"][new Date().getDay()]}요일
+            </p>
           </div>
           <Link
             href="/"

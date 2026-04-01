@@ -51,6 +51,34 @@ const ROADMAP: (string | number)[][] = [
   [4, "2026-04-26", "Sunday",    "일요일", "4주 전체 회고 및 2단계 계획 수립",      "review",   90,  "4주 완료 회고 및 다음 단계 준비"],
 ];
 
+const DAY_ORDER_GLOBAL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function buildWeeklyPlanFromMemory(week: number): NextResponse {
+  const weekRows = ROADMAP.filter((r) => Number(r[0]) === week);
+  const daysMap = new Map<string, DayPlan>();
+  for (const r of weekRows) {
+    const dayKey = r[2] as string;
+    if (!daysMap.has(dayKey)) {
+      daysMap.set(dayKey, { day: r[2] as string, dayKr: r[3] as string, sessions: [], totalMinutes: 0 });
+    }
+    const session: Session = {
+      topic: r[4] as string,
+      type: (r[5] ?? "study") as Session["type"],
+      duration: Number(r[6]) || 0,
+      description: r[7] as string,
+    };
+    const dp = daysMap.get(dayKey)!;
+    dp.sessions.push(session);
+    dp.totalMinutes += session.duration;
+  }
+  const weeklyPlan: WeeklyPlan = {
+    weekNumber: week,
+    theme: WEEK_THEMES[week - 1] ?? "",
+    days: DAY_ORDER_GLOBAL.map((d) => daysMap.get(d)).filter(Boolean) as DayPlan[],
+  };
+  return NextResponse.json({ weeklyPlan, currentWeek: week, totalWeeks: 4, startDate: START_DATE });
+}
+
 // 현재 주차 계산 (1~4, 범위 초과 시 클램프)
 function getCurrentWeek(): number {
   const start = new Date(START_DATE).getTime();
@@ -88,9 +116,10 @@ export async function POST() {
 
 // ── GET: 현재 주차 WeeklyPlan 반환 ─────────────────────────────────────────
 export async function GET() {
+  const currentWeek = getCurrentWeek();
   try {
     if (!SPREADSHEET_ID) {
-      return NextResponse.json({ weeklyPlan: null, currentWeek: 0 });
+      return buildWeeklyPlanFromMemory(currentWeek);
     }
 
     const sheets = getSheetsClient();
@@ -101,11 +130,11 @@ export async function GET() {
     });
 
     const allRows = (res.data.values ?? []).slice(1); // 헤더 제거
-    if (allRows.length === 0) {
-      return NextResponse.json({ weeklyPlan: null, currentWeek: 0 });
-    }
 
-    const currentWeek = getCurrentWeek();
+    // Sheets가 비어있으면 메모리 ROADMAP에서 직접 반환
+    if (allRows.length === 0) {
+      return buildWeeklyPlanFromMemory(currentWeek);
+    }
     const weekRows = allRows.filter((r) => Number(r[0]) === currentWeek);
 
     const DAY_ORDER = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

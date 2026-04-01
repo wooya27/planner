@@ -18,7 +18,7 @@ export interface Exam {
 export const EXAM_DB: Exam[] = [
   {
     id: "ipc",
-    name: "정보처리기사",
+    name: "정보처리기사 필기",
     category: "IT",
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
@@ -26,6 +26,24 @@ export const EXAM_DB: Exam[] = [
       { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-02-15", resultDate: "2025-03-19" },
       { round: "2025년 2회", registrationStart: "2025-04-14", registrationEnd: "2025-04-17", examDate: "2025-05-17", resultDate: "2025-06-25" },
       { round: "2025년 3회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-26", resultDate: "2025-08-27" },
+      { round: "2026년 1회", registrationStart: "2026-01-27", registrationEnd: "2026-01-30", examDate: "2026-02-15", resultDate: "2026-03-18" },
+      { round: "2026년 2회", registrationStart: "2026-04-14", registrationEnd: "2026-04-17", examDate: "2026-05-10", resultDate: "2026-06-10" },
+      { round: "2026년 3회", registrationStart: "2026-06-16", registrationEnd: "2026-06-19", examDate: "2026-07-12", resultDate: "2026-08-12" },
+    ],
+  },
+  {
+    id: "ipc-practical",
+    name: "정보처리기사 실기",
+    category: "IT",
+    organization: "한국산업인력공단 (큐넷)",
+    infoUrl: "https://www.q-net.or.kr",
+    schedules: [
+      { round: "2025년 1회", registrationStart: "2025-03-17", registrationEnd: "2025-03-20", examDate: "2025-04-19", resultDate: "2025-05-28" },
+      { round: "2025년 2회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-27" },
+      { round: "2025년 3회", registrationStart: "2025-08-25", registrationEnd: "2025-08-28", examDate: "2025-09-27", resultDate: "2025-11-05" },
+      { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-18", resultDate: "2026-06-05" },
+      { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-09-04" },
+      { round: "2026년 3회", registrationStart: "2026-09-21", registrationEnd: "2026-09-28", examDate: "2026-10-24", resultDate: "2026-12-11" },
     ],
   },
   {
@@ -56,6 +74,32 @@ export const EXAM_DB: Exam[] = [
       { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-25", resultDate: "2026-06-03" },
       { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-08-26" },
       { round: "2026년 3회", registrationStart: "2026-08-24", registrationEnd: "2026-08-27", examDate: "2026-09-26", resultDate: "2026-11-04" },
+    ],
+  },
+  {
+    id: "bigdata-written",
+    name: "빅데이터분석기사 필기",
+    category: "IT",
+    organization: "한국데이터산업진흥원",
+    infoUrl: "https://www.dataq.or.kr",
+    schedules: [
+      { round: "2025년 11회", registrationStart: "2025-03-24", registrationEnd: "2025-03-28", examDate: "2025-04-26", resultDate: "2025-05-14" },
+      { round: "2025년 12회", registrationStart: "2025-08-25", registrationEnd: "2025-08-29", examDate: "2025-09-27", resultDate: "2025-10-15" },
+      { round: "2026년 12회", registrationStart: "2026-03-23", registrationEnd: "2026-03-27", examDate: "2026-04-25", resultDate: "2026-05-13" },
+      { round: "2026년 13회", registrationStart: "2026-08-24", registrationEnd: "2026-08-28", examDate: "2026-09-26", resultDate: "2026-10-14" },
+    ],
+  },
+  {
+    id: "bigdata-practical",
+    name: "빅데이터분석기사 실기",
+    category: "IT",
+    organization: "한국데이터산업진흥원",
+    infoUrl: "https://www.dataq.or.kr",
+    schedules: [
+      { round: "2025년 11회", registrationStart: "2025-05-19", registrationEnd: "2025-05-23", examDate: "2025-06-21", resultDate: "2025-07-09" },
+      { round: "2025년 12회", registrationStart: "2025-10-20", registrationEnd: "2025-10-24", examDate: "2025-11-22", resultDate: "2025-12-10" },
+      { round: "2026년 12회", registrationStart: "2026-05-18", registrationEnd: "2026-05-22", examDate: "2026-06-20", resultDate: "2026-07-08" },
+      { round: "2026년 13회", registrationStart: "2026-10-19", registrationEnd: "2026-10-23", examDate: "2026-11-21", resultDate: "2026-12-09" },
     ],
   },
   {
