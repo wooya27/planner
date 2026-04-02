@@ -83,7 +83,7 @@ export default function Home() {
         const session = {
           topic: `[${exam.name}] D-${daysLeft} ${type === "study" ? "핵심 이론" : type === "practice" ? "문제 풀이" : "최종 복습"}`,
           type,
-          duration: 90,
+          duration: 45,
           description: `${exam.name} ${schedule.round} 시험까지 ${daysLeft}일`,
         };
         if (!dayPlans.has(name)) {
@@ -91,7 +91,7 @@ export default function Home() {
         }
         const dp = dayPlans.get(name)!;
         dp.sessions.push(session);
-        dp.totalMinutes += 90;
+        dp.totalMinutes += 45;
       }
     }
     if (dayPlans.size === 0) return null;
