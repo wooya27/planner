@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { GoalInfo, PlanRequest } from "@/types/plan";
 import { searchExams, getUpcomingSchedule, Exam } from "@/data/exams";
+import PomodoroTimer from "@/components/PomodoroTimer";
 
 interface GoalPanelProps {
   goalInfo: GoalInfo | null;
@@ -262,20 +263,9 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
         </div>
       )}
 
-      {/* ── Spaced Repetition ── */}
+      {/* ── 뽀모도로 타이머 ── */}
       <div className="border-t border-gray-800 pt-4">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">🧠 망각곡선 복습주기</h3>
-        <div className="space-y-1.5">
-          {reviewIntervals.map((r) => (
-            <div key={r.label} className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-7">{r.label}</span>
-              <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                <div className={`h-full ${r.color} rounded-full`} style={{ width: `${r.retention}%` }} />
-              </div>
-              <span className="text-xs text-gray-600 w-7 text-right">{r.retention}%</span>
-            </div>
-          ))}
-        </div>
+        <PomodoroTimer />
       </div>
     </div>
   );

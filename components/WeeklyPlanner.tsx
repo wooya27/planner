@@ -2,8 +2,15 @@
 
 import { WeeklyPlan, DayPlan } from "@/types/plan";
 
+export interface ExamRegEvent {
+  dayName: string;
+  title: string;
+  endDate: string;
+}
+
 interface WeeklyPlannerProps {
   weeklyPlan: WeeklyPlan;
+  examRegistrations?: ExamRegEvent[];
 }
 
 const sessionTypeConfig = {
@@ -23,7 +30,7 @@ const DAY_KR: Record<string, string> = {
   Thursday: "목", Friday: "금", Saturday: "토", Sunday: "일",
 };
 
-function DayCard({ day, isToday, isSunday }: { day: DayPlan; isToday: boolean; isSunday?: boolean }) {
+function DayCard({ day, isToday, isSunday, examReg }: { day: DayPlan; isToday: boolean; isSunday?: boolean; examReg?: { title: string; endDate: string }[] }) {
   const hours = Math.floor(day.totalMinutes / 60);
   const mins  = day.totalMinutes % 60;
 
@@ -52,6 +59,21 @@ function DayCard({ day, isToday, isSunday }: { day: DayPlan; isToday: boolean; i
           </span>
         )}
       </div>
+
+      {/* 시험 접수 시작 알림 */}
+      {examReg && examReg.length > 0 && (
+        <div className="px-2 pt-2 space-y-1">
+          {examReg.map((reg, i) => (
+            <div key={i} className="flex items-start gap-1 px-2 py-1.5 rounded border bg-orange-500/20 border-orange-400/50">
+              <span className="text-xs">📋</span>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-orange-100 leading-tight break-words">{reg.title} 접수 시작</p>
+                <p className="text-xs text-orange-300/70 mt-0.5">~{reg.endDate}까지</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Sessions */}
       <div className={`p-2 space-y-1.5 overflow-y-auto ${isSunday ? "grid grid-cols-3 gap-2 space-y-0" : ""}`}>
@@ -93,13 +115,16 @@ function DayCard({ day, isToday, isSunday }: { day: DayPlan; isToday: boolean; i
   );
 }
 
-export default function WeeklyPlanner({ weeklyPlan }: WeeklyPlannerProps) {
+export default function WeeklyPlanner({ weeklyPlan, examRegistrations = [] }: WeeklyPlannerProps) {
   const today    = new Date();
   const todayDay = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][today.getDay()];
 
   const getDay = (dayName: string): DayPlan =>
     weeklyPlan.days.find((d) => d.day === dayName) ??
     { day: dayName, dayKr: DAY_KR[dayName] + "요일", sessions: [], totalMinutes: 0 };
+
+  const getExamReg = (dayName: string) =>
+    examRegistrations.filter((e) => e.dayName === dayName).map(({ title, endDate }) => ({ title, endDate }));
 
   return (
     <div className="flex flex-col h-full gap-2">
@@ -122,20 +147,20 @@ export default function WeeklyPlanner({ weeklyPlan }: WeeklyPlannerProps) {
       {/* 1행: 월 화 수 */}
       <div className="grid grid-cols-3 gap-2 flex-1">
         {ROW1.map((dayName) => (
-          <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} />
+          <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} examReg={getExamReg(dayName)} />
         ))}
       </div>
 
       {/* 2행: 목 금 토 */}
       <div className="grid grid-cols-3 gap-2 flex-1">
         {ROW2.map((dayName) => (
-          <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} />
+          <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} examReg={getExamReg(dayName)} />
         ))}
       </div>
 
       {/* 3행: 일요일만 (전체 폭) */}
       <div>
-        <DayCard day={getDay("Sunday")} isToday={todayDay === "Sunday"} isSunday />
+        <DayCard day={getDay("Sunday")} isToday={todayDay === "Sunday"} isSunday examReg={getExamReg("Sunday")} />
       </div>
     </div>
   );

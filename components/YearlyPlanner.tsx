@@ -8,10 +8,10 @@ interface YearlyPlannerProps {
 
 const eventTypeConfig = {
   registration: {
-    bg: "bg-orange-500/15",
-    border: "border-orange-500/30",
-    text: "text-orange-300",
-    dot: "bg-orange-500",
+    bg: "bg-gray-700/50",
+    border: "border-gray-600/60",
+    text: "text-gray-200",
+    dot: "bg-gray-400",
     label: "접수",
     emoji: "📋",
   },

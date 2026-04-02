@@ -23,12 +23,9 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-02-15", resultDate: "2025-03-19" },
-      { round: "2025년 2회", registrationStart: "2025-04-14", registrationEnd: "2025-04-17", examDate: "2025-05-17", resultDate: "2025-06-25" },
-      { round: "2025년 3회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-26", resultDate: "2025-08-27" },
-      { round: "2026년 1회", registrationStart: "2026-01-27", registrationEnd: "2026-01-30", examDate: "2026-02-15", resultDate: "2026-03-18" },
-      { round: "2026년 2회", registrationStart: "2026-04-14", registrationEnd: "2026-04-17", examDate: "2026-05-10", resultDate: "2026-06-10" },
-      { round: "2026년 3회", registrationStart: "2026-06-16", registrationEnd: "2026-06-19", examDate: "2026-07-12", resultDate: "2026-08-12" },
+      { round: "2026년 1회", registrationStart: "2026-01-27", registrationEnd: "2026-01-30", examDate: "2026-02-15", resultDate: "2026-03-04" },
+      { round: "2026년 2회", registrationStart: "2026-04-14", registrationEnd: "2026-04-17", examDate: "2026-05-10", resultDate: "2026-05-27" },
+      { round: "2026년 3회", registrationStart: "2026-06-16", registrationEnd: "2026-06-19", examDate: "2026-07-12", resultDate: "2026-07-29" },
     ],
   },
   {
@@ -38,9 +35,6 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-03-17", registrationEnd: "2025-03-20", examDate: "2025-04-19", resultDate: "2025-05-28" },
-      { round: "2025년 2회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-27" },
-      { round: "2025년 3회", registrationStart: "2025-08-25", registrationEnd: "2025-08-28", examDate: "2025-09-27", resultDate: "2025-11-05" },
       { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-18", resultDate: "2026-06-05" },
       { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-09-04" },
       { round: "2026년 3회", registrationStart: "2026-09-21", registrationEnd: "2026-09-28", examDate: "2026-10-24", resultDate: "2026-12-11" },
@@ -53,9 +47,6 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-02-15", resultDate: "2025-03-19" },
-      { round: "2025년 2회", registrationStart: "2025-04-14", registrationEnd: "2025-04-17", examDate: "2025-05-17", resultDate: "2025-06-25" },
-      { round: "2025년 3회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-26", resultDate: "2025-08-27" },
       { round: "2026년 1회", registrationStart: "2026-01-05", registrationEnd: "2026-01-08", examDate: "2026-02-14", resultDate: "2026-03-18" },
       { round: "2026년 2회", registrationStart: "2026-04-13", registrationEnd: "2026-04-16", examDate: "2026-05-09", resultDate: "2026-06-10" },
       { round: "2026년 3회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-08-19" },
@@ -68,9 +59,6 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-03-17", registrationEnd: "2025-03-20", examDate: "2025-04-19", resultDate: "2025-05-28" },
-      { round: "2025년 2회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-27" },
-      { round: "2025년 3회", registrationStart: "2025-08-25", registrationEnd: "2025-08-28", examDate: "2025-09-27", resultDate: "2025-11-05" },
       { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-25", resultDate: "2026-06-03" },
       { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-08-26" },
       { round: "2026년 3회", registrationStart: "2026-08-24", registrationEnd: "2026-08-27", examDate: "2026-09-26", resultDate: "2026-11-04" },
@@ -83,10 +71,8 @@ export const EXAM_DB: Exam[] = [
     organization: "한국데이터산업진흥원",
     infoUrl: "https://www.dataq.or.kr",
     schedules: [
-      { round: "2025년 11회", registrationStart: "2025-03-24", registrationEnd: "2025-03-28", examDate: "2025-04-26", resultDate: "2025-05-14" },
-      { round: "2025년 12회", registrationStart: "2025-08-25", registrationEnd: "2025-08-29", examDate: "2025-09-27", resultDate: "2025-10-15" },
-      { round: "2026년 12회", registrationStart: "2026-03-23", registrationEnd: "2026-03-27", examDate: "2026-04-25", resultDate: "2026-05-13" },
-      { round: "2026년 13회", registrationStart: "2026-08-24", registrationEnd: "2026-08-28", examDate: "2026-09-26", resultDate: "2026-10-14" },
+      { round: "2026년 12회", registrationStart: "2026-03-03", registrationEnd: "2026-03-09", examDate: "2026-04-04", resultDate: "2026-04-24" },
+      { round: "2026년 13회", registrationStart: "2026-08-03", registrationEnd: "2026-08-07", examDate: "2026-09-05", resultDate: "2026-09-23" },
     ],
   },
   {
@@ -96,10 +82,8 @@ export const EXAM_DB: Exam[] = [
     organization: "한국데이터산업진흥원",
     infoUrl: "https://www.dataq.or.kr",
     schedules: [
-      { round: "2025년 11회", registrationStart: "2025-05-19", registrationEnd: "2025-05-23", examDate: "2025-06-21", resultDate: "2025-07-09" },
-      { round: "2025년 12회", registrationStart: "2025-10-20", registrationEnd: "2025-10-24", examDate: "2025-11-22", resultDate: "2025-12-10" },
-      { round: "2026년 12회", registrationStart: "2026-05-18", registrationEnd: "2026-05-22", examDate: "2026-06-20", resultDate: "2026-07-08" },
-      { round: "2026년 13회", registrationStart: "2026-10-19", registrationEnd: "2026-10-23", examDate: "2026-11-21", resultDate: "2026-12-09" },
+      { round: "2026년 12회", registrationStart: "2026-05-18", registrationEnd: "2026-05-22", examDate: "2026-06-20", resultDate: "2026-07-10" },
+      { round: "2026년 13회", registrationStart: "2026-10-26", registrationEnd: "2026-10-30", examDate: "2026-11-28", resultDate: "2026-12-18" },
     ],
   },
   {
@@ -108,14 +92,7 @@ export const EXAM_DB: Exam[] = [
     category: "IT",
     organization: "대한상공회의소",
     infoUrl: "https://license.korcham.net",
-    schedules: [
-      { round: "2025년 상반기", registrationStart: "2025-01-13", registrationEnd: "2025-01-17", examDate: "2025-02-08", resultDate: "2025-02-28" },
-      { round: "2025년 2회", registrationStart: "2025-03-10", registrationEnd: "2025-03-14", examDate: "2025-04-05", resultDate: "2025-04-25" },
-      { round: "2025년 3회", registrationStart: "2025-05-12", registrationEnd: "2025-05-16", examDate: "2025-06-07", resultDate: "2025-06-27" },
-      { round: "2025년 4회", registrationStart: "2025-07-07", registrationEnd: "2025-07-11", examDate: "2025-08-02", resultDate: "2025-08-22" },
-      { round: "2025년 5회", registrationStart: "2025-09-01", registrationEnd: "2025-09-05", examDate: "2025-09-27", resultDate: "2025-10-17" },
-      { round: "2025년 6회", registrationStart: "2025-10-20", registrationEnd: "2025-10-24", examDate: "2025-11-15", resultDate: "2025-12-05" },
-    ],
+    schedules: [],
   },
   {
     id: "cca2",
@@ -123,12 +100,7 @@ export const EXAM_DB: Exam[] = [
     category: "IT",
     organization: "대한상공회의소",
     infoUrl: "https://license.korcham.net",
-    schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-13", registrationEnd: "2025-01-17", examDate: "2025-02-08", resultDate: "2025-02-28" },
-      { round: "2025년 2회", registrationStart: "2025-03-10", registrationEnd: "2025-03-14", examDate: "2025-04-05", resultDate: "2025-04-25" },
-      { round: "2025년 3회", registrationStart: "2025-05-12", registrationEnd: "2025-05-16", examDate: "2025-06-07", resultDate: "2025-06-27" },
-      { round: "2025년 4회", registrationStart: "2025-07-07", registrationEnd: "2025-07-11", examDate: "2025-08-02", resultDate: "2025-08-22" },
-    ],
+    schedules: [],
   },
   {
     id: "sqld",
@@ -137,14 +109,10 @@ export const EXAM_DB: Exam[] = [
     organization: "한국데이터산업진흥원",
     infoUrl: "https://www.dataq.or.kr",
     schedules: [
-      { round: "2025년 53회", registrationStart: "2025-03-10", registrationEnd: "2025-03-21", examDate: "2025-04-12", resultDate: "2025-05-02" },
-      { round: "2025년 54회", registrationStart: "2025-06-09", registrationEnd: "2025-06-20", examDate: "2025-07-12", resultDate: "2025-08-01" },
-      { round: "2025년 55회", registrationStart: "2025-09-08", registrationEnd: "2025-09-19", examDate: "2025-10-11", resultDate: "2025-10-31" },
-      { round: "2025년 56회", registrationStart: "2025-11-10", registrationEnd: "2025-11-21", examDate: "2025-12-13", resultDate: "2026-01-09" },
-      { round: "2026년 57회", registrationStart: "2026-03-09", registrationEnd: "2026-03-20", examDate: "2026-04-11", resultDate: "2026-05-08" },
-      { round: "2026년 58회", registrationStart: "2026-06-08", registrationEnd: "2026-06-19", examDate: "2026-07-11", resultDate: "2026-07-31" },
-      { round: "2026년 59회", registrationStart: "2026-09-07", registrationEnd: "2026-09-18", examDate: "2026-10-10", resultDate: "2026-10-30" },
-      { round: "2026년 60회", registrationStart: "2026-11-09", registrationEnd: "2026-11-20", examDate: "2026-12-12", resultDate: "2027-01-08" },
+      { round: "2026년 60회", registrationStart: "2026-02-02", registrationEnd: "2026-02-06", examDate: "2026-03-07", resultDate: "2026-03-27" },
+      { round: "2026년 61회", registrationStart: "2026-04-27", registrationEnd: "2026-05-01", examDate: "2026-05-31", resultDate: "2026-06-19" },
+      { round: "2026년 62회", registrationStart: "2026-07-20", registrationEnd: "2026-07-24", examDate: "2026-08-22", resultDate: "2026-09-11" },
+      { round: "2026년 63회", registrationStart: "2026-10-12", registrationEnd: "2026-10-16", examDate: "2026-11-14", resultDate: "2026-12-04" },
     ],
   },
   {
@@ -153,11 +121,7 @@ export const EXAM_DB: Exam[] = [
     category: "IT/데이터",
     organization: "한국데이터산업진흥원",
     infoUrl: "https://www.dataq.or.kr",
-    schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-17", examDate: "2025-02-22", resultDate: "2025-03-21" },
-      { round: "2025년 2회", registrationStart: "2025-05-12", registrationEnd: "2025-05-23", examDate: "2025-06-28", resultDate: "2025-07-25" },
-      { round: "2025년 3회", registrationStart: "2025-09-01", registrationEnd: "2025-09-12", examDate: "2025-10-18", resultDate: "2025-11-14" },
-    ],
+    schedules: [],
   },
   {
     id: "adsp",
@@ -166,14 +130,10 @@ export const EXAM_DB: Exam[] = [
     organization: "한국데이터산업진흥원",
     infoUrl: "https://www.dataq.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-13", registrationEnd: "2025-01-24", examDate: "2025-03-01", resultDate: "2025-03-28" },
-      { round: "2025년 2회", registrationStart: "2025-04-07", registrationEnd: "2025-04-18", examDate: "2025-05-24", resultDate: "2025-06-20" },
-      { round: "2025년 3회", registrationStart: "2025-07-07", registrationEnd: "2025-07-18", examDate: "2025-08-23", resultDate: "2025-09-19" },
-      { round: "2025년 4회", registrationStart: "2025-10-06", registrationEnd: "2025-10-17", examDate: "2025-11-22", resultDate: "2025-12-19" },
-      { round: "2026년 1회", registrationStart: "2026-01-12", registrationEnd: "2026-01-23", examDate: "2026-02-28", resultDate: "2026-03-27" },
-      { round: "2026년 2회", registrationStart: "2026-04-06", registrationEnd: "2026-04-17", examDate: "2026-05-23", resultDate: "2026-06-19" },
-      { round: "2026년 3회", registrationStart: "2026-07-06", registrationEnd: "2026-07-17", examDate: "2026-08-22", resultDate: "2026-09-18" },
-      { round: "2026년 4회", registrationStart: "2026-10-05", registrationEnd: "2026-10-16", examDate: "2026-11-21", resultDate: "2026-12-18" },
+      { round: "2026년 48회", registrationStart: "2026-01-05", registrationEnd: "2026-01-09", examDate: "2026-02-07", resultDate: "2026-03-06" },
+      { round: "2026년 49회", registrationStart: "2026-04-13", registrationEnd: "2026-04-17", examDate: "2026-05-17", resultDate: "2026-06-05" },
+      { round: "2026년 50회", registrationStart: "2026-07-06", registrationEnd: "2026-07-10", examDate: "2026-08-08", resultDate: "2026-08-28" },
+      { round: "2026년 51회", registrationStart: "2026-09-28", registrationEnd: "2026-10-02", examDate: "2026-10-31", resultDate: "2026-11-20" },
     ],
   },
   {
@@ -182,19 +142,23 @@ export const EXAM_DB: Exam[] = [
     category: "어학",
     organization: "YBM",
     infoUrl: "https://www.toeic.co.kr",
+    schedules: [],
+  },
+  {
+    id: "tesat",
+    name: "TESAT (테셋)",
+    category: "경제",
+    organization: "한국경제신문",
+    infoUrl: "https://www.tesat.or.kr",
     schedules: [
-      { round: "2025년 1월", registrationStart: "2024-12-09", registrationEnd: "2024-12-13", examDate: "2025-01-12", resultDate: "2025-01-21" },
-      { round: "2025년 2월", registrationStart: "2025-01-06", registrationEnd: "2025-01-10", examDate: "2025-02-16", resultDate: "2025-02-25" },
-      { round: "2025년 3월", registrationStart: "2025-02-03", registrationEnd: "2025-02-07", examDate: "2025-03-23", resultDate: "2025-04-01" },
-      { round: "2025년 4월", registrationStart: "2025-03-03", registrationEnd: "2025-03-07", examDate: "2025-04-13", resultDate: "2025-04-22" },
-      { round: "2025년 5월", registrationStart: "2025-04-07", registrationEnd: "2025-04-11", examDate: "2025-05-18", resultDate: "2025-05-27" },
-      { round: "2025년 6월", registrationStart: "2025-05-06", registrationEnd: "2025-05-09", examDate: "2025-06-22", resultDate: "2025-07-01" },
-      { round: "2025년 7월", registrationStart: "2025-06-02", registrationEnd: "2025-06-05", examDate: "2025-07-13", resultDate: "2025-07-22" },
-      { round: "2025년 8월", registrationStart: "2025-07-07", registrationEnd: "2025-07-11", examDate: "2025-08-17", resultDate: "2025-08-26" },
-      { round: "2025년 9월", registrationStart: "2025-08-04", registrationEnd: "2025-08-08", examDate: "2025-09-14", resultDate: "2025-09-23" },
-      { round: "2025년 10월", registrationStart: "2025-09-01", registrationEnd: "2025-09-05", examDate: "2025-10-12", resultDate: "2025-10-21" },
-      { round: "2025년 11월", registrationStart: "2025-10-06", registrationEnd: "2025-10-10", examDate: "2025-11-16", resultDate: "2025-11-25" },
-      { round: "2025년 12월", registrationStart: "2025-11-03", registrationEnd: "2025-11-07", examDate: "2025-12-14", resultDate: "2025-12-23" },
+      { round: "2026년 103회", registrationStart: "2025-12-30", registrationEnd: "2026-01-26", examDate: "2026-02-07", resultDate: "2026-02-13" },
+      { round: "2026년 104회", registrationStart: "2026-02-10", registrationEnd: "2026-03-09", examDate: "2026-03-21", resultDate: "2026-03-27" },
+      { round: "2026년 105회", registrationStart: "2026-03-24", registrationEnd: "2026-05-04", examDate: "2026-05-16", resultDate: "2026-05-22" },
+      { round: "2026년 106회", registrationStart: "2026-05-19", registrationEnd: "2026-06-15", examDate: "2026-06-27", resultDate: "2026-07-03" },
+      { round: "2026년 107회", registrationStart: "2026-06-30", registrationEnd: "2026-07-27", examDate: "2026-08-08", resultDate: "2026-08-14" },
+      { round: "2026년 108회", registrationStart: "2026-08-11", registrationEnd: "2026-09-07", examDate: "2026-09-19", resultDate: "2026-09-23" },
+      { round: "2026년 109회", registrationStart: "2026-09-22", registrationEnd: "2026-10-26", examDate: "2026-11-07", resultDate: "2026-11-13" },
+      { round: "2026년 110회", registrationStart: "2026-11-10", registrationEnd: "2026-12-07", examDate: "2026-12-19", resultDate: "2026-12-24" },
     ],
   },
   {
@@ -203,13 +167,7 @@ export const EXAM_DB: Exam[] = [
     category: "한국사",
     organization: "국사편찬위원회",
     infoUrl: "https://www.historyexam.go.kr",
-    schedules: [
-      { round: "2025년 68회", registrationStart: "2025-02-03", registrationEnd: "2025-02-14", examDate: "2025-03-22", resultDate: "2025-04-11" },
-      { round: "2025년 69회", registrationStart: "2025-04-07", registrationEnd: "2025-04-18", examDate: "2025-05-17", resultDate: "2025-06-06" },
-      { round: "2025년 70회", registrationStart: "2025-06-09", registrationEnd: "2025-06-20", examDate: "2025-07-19", resultDate: "2025-08-08" },
-      { round: "2025년 71회", registrationStart: "2025-08-11", registrationEnd: "2025-08-22", examDate: "2025-09-27", resultDate: "2025-10-17" },
-      { round: "2025년 72회", registrationStart: "2025-10-13", registrationEnd: "2025-10-24", examDate: "2025-11-22", resultDate: "2025-12-12" },
-    ],
+    schedules: [],
   },
   {
     id: "electric",
@@ -217,11 +175,7 @@ export const EXAM_DB: Exam[] = [
     category: "전기",
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
-    schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-03-01", resultDate: "2025-03-26" },
-      { round: "2025년 2회", registrationStart: "2025-04-14", registrationEnd: "2025-04-17", examDate: "2025-05-24", resultDate: "2025-06-25" },
-      { round: "2025년 3회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-27" },
-    ],
+    schedules: [],
   },
   {
     id: "safety",
@@ -229,11 +183,7 @@ export const EXAM_DB: Exam[] = [
     category: "안전",
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
-    schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-03-01", resultDate: "2025-03-26" },
-      { round: "2025년 2회", registrationStart: "2025-04-14", registrationEnd: "2025-04-17", examDate: "2025-05-24", resultDate: "2025-06-25" },
-      { round: "2025년 3회", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-27" },
-    ],
+    schedules: [],
   },
   {
     id: "civil9",
@@ -241,9 +191,7 @@ export const EXAM_DB: Exam[] = [
     category: "공무원",
     organization: "인사혁신처",
     infoUrl: "https://www.gosi.kr",
-    schedules: [
-      { round: "2025년", registrationStart: "2025-01-20", registrationEnd: "2025-01-23", examDate: "2025-04-05", resultDate: "2025-06-04" },
-    ],
+    schedules: [],
   },
   {
     id: "civil7",
@@ -251,10 +199,7 @@ export const EXAM_DB: Exam[] = [
     category: "공무원",
     organization: "인사혁신처",
     infoUrl: "https://www.gosi.kr",
-    schedules: [
-      { round: "2025년 1차 (PSAT)", registrationStart: "2025-01-20", registrationEnd: "2025-01-23", examDate: "2025-02-22", resultDate: "2025-03-14" },
-      { round: "2025년 2차 (전공)", registrationStart: "2025-01-20", registrationEnd: "2025-01-23", examDate: "2025-07-12", resultDate: "2025-09-12" },
-    ],
+    schedules: [],
   },
   {
     id: "cpa",
@@ -262,10 +207,7 @@ export const EXAM_DB: Exam[] = [
     category: "회계/금융",
     organization: "금융감독원",
     infoUrl: "https://cpa.fss.or.kr",
-    schedules: [
-      { round: "2025년 1차", registrationStart: "2025-01-02", registrationEnd: "2025-01-10", examDate: "2025-02-22", resultDate: "2025-04-11" },
-      { round: "2025년 2차", registrationStart: "2025-04-28", registrationEnd: "2025-05-02", examDate: "2025-06-28", resultDate: "2025-09-05" },
-    ],
+    schedules: [],
   },
   {
     id: "aicpa",
@@ -273,10 +215,7 @@ export const EXAM_DB: Exam[] = [
     category: "회계/금융",
     organization: "한국세무사회",
     infoUrl: "https://www.kacpta.or.kr",
-    schedules: [
-      { round: "2025년 1차", registrationStart: "2025-01-13", registrationEnd: "2025-01-17", examDate: "2025-03-01", resultDate: "2025-04-18" },
-      { round: "2025년 2차", registrationStart: "2025-05-26", registrationEnd: "2025-05-30", examDate: "2025-07-26", resultDate: "2025-11-07" },
-    ],
+    schedules: [],
   },
   {
     id: "iaim",
@@ -285,12 +224,10 @@ export const EXAM_DB: Exam[] = [
     organization: "한국금융투자협회 (KOFIA)",
     infoUrl: "https://license.kofia.or.kr",
     schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-06", registrationEnd: "2025-01-10", examDate: "2025-02-15", resultDate: "2025-03-07" },
-      { round: "2025년 2회", registrationStart: "2025-04-07", registrationEnd: "2025-04-11", examDate: "2025-05-17", resultDate: "2025-06-06" },
-      { round: "2025년 3회", registrationStart: "2025-09-08", registrationEnd: "2025-09-12", examDate: "2025-10-18", resultDate: "2025-11-07" },
-      { round: "2026년 1회", registrationStart: "2026-01-05", registrationEnd: "2026-01-09", examDate: "2026-02-14", resultDate: "2026-03-06" },
-      { round: "2026년 2회", registrationStart: "2026-04-06", registrationEnd: "2026-04-10", examDate: "2026-05-16", resultDate: "2026-06-05" },
-      { round: "2026년 3회", registrationStart: "2026-09-07", registrationEnd: "2026-09-11", examDate: "2026-10-17", resultDate: "2026-11-06" },
+      { round: "2026년 44회", registrationStart: "2025-12-22", registrationEnd: "2025-12-26", examDate: "2026-01-18", resultDate: "2026-01-29" },
+      { round: "2026년 45회", registrationStart: "2026-03-09", registrationEnd: "2026-03-13", examDate: "2026-04-19", resultDate: "2026-05-01" },
+      { round: "2026년 46회", registrationStart: "2026-06-08", registrationEnd: "2026-06-12", examDate: "2026-07-19", resultDate: "2026-07-31" },
+      { round: "2026년 47회", registrationStart: "2026-09-07", registrationEnd: "2026-09-11", examDate: "2026-10-18", resultDate: "2026-10-30" },
     ],
   },
   {
@@ -300,10 +237,6 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2025년 1회 필기", registrationStart: "2025-01-06", registrationEnd: "2025-01-09", examDate: "2025-02-08", resultDate: "2025-03-05" },
-      { round: "2025년 1회 실기", registrationStart: "2025-03-24", registrationEnd: "2025-03-27", examDate: "2025-04-19", resultDate: "2025-05-28" },
-      { round: "2025년 2회 필기", registrationStart: "2025-06-23", registrationEnd: "2025-06-26", examDate: "2025-07-19", resultDate: "2025-08-13" },
-      { round: "2025년 2회 실기", registrationStart: "2025-08-25", registrationEnd: "2025-08-28", examDate: "2025-09-27", resultDate: "2025-11-05" },
       { round: "2026년 1회 필기", registrationStart: "2026-01-05", registrationEnd: "2026-01-08", examDate: "2026-02-07", resultDate: "2026-03-04" },
       { round: "2026년 1회 실기", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-18", resultDate: "2026-05-27" },
       { round: "2026년 2회 필기", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-08-12" },
@@ -316,9 +249,7 @@ export const EXAM_DB: Exam[] = [
     category: "클라우드",
     organization: "Amazon Web Services",
     infoUrl: "https://aws.amazon.com/certification",
-    schedules: [
-      { round: "상시 응시 가능", registrationStart: "2025-01-01", registrationEnd: "2025-12-31", examDate: "2025-12-31", resultDate: "2025-12-31" },
-    ],
+    schedules: [],
   },
   {
     id: "gtq",
@@ -326,14 +257,7 @@ export const EXAM_DB: Exam[] = [
     category: "디자인",
     organization: "한국생산성본부",
     infoUrl: "https://www.kpc.or.kr",
-    schedules: [
-      { round: "2025년 1회", registrationStart: "2025-01-13", registrationEnd: "2025-01-17", examDate: "2025-02-08", resultDate: "2025-02-28" },
-      { round: "2025년 2회", registrationStart: "2025-03-17", registrationEnd: "2025-03-21", examDate: "2025-04-12", resultDate: "2025-05-02" },
-      { round: "2025년 3회", registrationStart: "2025-05-12", registrationEnd: "2025-05-16", examDate: "2025-06-14", resultDate: "2025-07-04" },
-      { round: "2025년 4회", registrationStart: "2025-07-14", registrationEnd: "2025-07-18", examDate: "2025-08-09", resultDate: "2025-08-29" },
-      { round: "2025년 5회", registrationStart: "2025-09-15", registrationEnd: "2025-09-19", examDate: "2025-10-11", resultDate: "2025-10-31" },
-      { round: "2025년 6회", registrationStart: "2025-11-03", registrationEnd: "2025-11-07", examDate: "2025-12-06", resultDate: "2025-12-26" },
-    ],
+    schedules: [],
   },
 ];
 

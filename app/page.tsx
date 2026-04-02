@@ -3,9 +3,10 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { StudyPlan, PlanRequest, WeeklyPlan, DayPlan } from "@/types/plan";
+import { EXAM_DB } from "@/data/exams";
 import VisionBoard from "@/components/VisionBoard";
 import TodayTasks from "@/components/TodayTasks";
-import WeeklyPlanner from "@/components/WeeklyPlanner";
+import WeeklyPlanner, { ExamRegEvent } from "@/components/WeeklyPlanner";
 import GoalPanel from "@/components/GoalPanel";
 
 const DAY_ORDER = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -47,6 +48,7 @@ export default function Home() {
   const [roadmapWeekNum, setRoadmapWeekNum] = useState(0);
   const [roadmapIniting, setRoadmapIniting] = useState(false);
   const [registrationTasks, setRegistrationTasks] = useState<import("@/types/plan").Task[]>([]);
+  const [savedExamItems, setSavedExamItems] = useState<{ examId: string; round: string }[]>([]);
 
   const displayWeeklyPlan = useMemo(() => {
     if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
@@ -54,6 +56,33 @@ export default function Home() {
   }, [roadmapWeek, plan]);
 
   const todayDayName = DAY_ORDER[new Date().getDay()];
+
+  // 이번 주 시험 접수 시작일 계산
+  const weekExamRegistrations = useMemo((): ExamRegEvent[] => {
+    if (savedExamItems.length === 0) return [];
+    const today = new Date(new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" }));
+    const dow = today.getDay(); // 0=일
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    const weekDateMap: Record<string, string> = {};
+    const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      weekDateMap[d.toLocaleDateString("en-CA")] = dayNames[i];
+    }
+    const result: ExamRegEvent[] = [];
+    for (const { examId, round } of savedExamItems) {
+      const exam = EXAM_DB.find((e) => e.id === examId);
+      const schedule = exam?.schedules.find((s) => s.round === round);
+      if (!schedule || !exam) continue;
+      const dayName = weekDateMap[schedule.registrationStart];
+      if (dayName) {
+        result.push({ dayName, title: exam.name, endDate: schedule.registrationEnd });
+      }
+    }
+    return result;
+  }, [savedExamItems]);
 
   const todayTasks = useMemo(() => {
     const roadmapTasks = roadmapWeek
@@ -96,11 +125,12 @@ export default function Home() {
 
         // 저장된 시험 접수 기간 체크
         try {
-          const { EXAM_DB } = await import("@/data/exams");
           const examRes = await fetch("/api/exam-search").then((r) => r.json());
+          const items: { examId: string; round: string }[] = examRes.items ?? [];
+          setSavedExamItems(items);
           const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
           const regTasks: import("@/types/plan").Task[] = [];
-          for (const { examId, round } of (examRes.items ?? [])) {
+          for (const { examId, round } of items) {
             const exam = EXAM_DB.find((e) => e.id === examId);
             const schedule = exam?.schedules.find((s) => s.round === round);
             if (!schedule) continue;
@@ -235,13 +265,11 @@ export default function Home() {
               goalInfo={plan?.goalInfo}
               studyTips={plan?.studyTips}
               onVisionTextChange={(text) => {
-                if (plan) {
-                  fetch("/api/save-plan", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ plan, visionText: text }),
-                  }).catch(() => {});
-                }
+                fetch("/api/save-plan", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ plan: plan ?? null, visionText: text }),
+                }).catch(() => {});
               }}
             />
             <div className="flex items-center justify-between">
@@ -293,7 +321,7 @@ export default function Home() {
             </div>
 
             {displayWeeklyPlan ? (
-              <WeeklyPlanner weeklyPlan={displayWeeklyPlan} />
+              <WeeklyPlanner weeklyPlan={displayWeeklyPlan} examRegistrations={weekExamRegistrations} />
             ) : isLoading ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-3">
                 <div className="w-10 h-10 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin" />
@@ -310,9 +338,6 @@ export default function Home() {
           </div>
         </div>
 
-<div className="text-center text-xs text-gray-700 pb-2">
-          복습 주기: 1일 → 3일 → 7일 → 14일 → 30일 (에빙하우스 망각곡선)
-        </div>
       </div>
     </div>
   );

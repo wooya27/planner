@@ -91,27 +91,25 @@ export default function ExamSearch({ onEventsChange }: ExamSearchProps) {
     load();
   }, []);
 
-  // addedExams 변경 시 로컬 저장 + 부모 이벤트 전달
+  // addedExams 변경 시 로컬 저장 + Sheets 자동저장 + 부모 이벤트 전달
   useEffect(() => {
     if (!loaded) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(addedExams));
     onEventsChange(addedExams.flatMap(({ exam, schedule }) => scheduleToEvents(exam, schedule)));
-  }, [addedExams, loaded]);
 
-  const handleSave = async () => {
+    // Sheets 자동저장 (실패해도 조용히 무시)
     setSaveStatus("saving");
-    try {
-      await fetch("/api/exam-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: addedExams.map((a) => ({ examId: a.exam.id, round: a.schedule.round })) }),
-      });
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    } catch {
-      setSaveStatus("idle");
-    }
-  };
+    fetch("/api/exam-search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: addedExams.map((a) => ({ examId: a.exam.id, round: a.schedule.round })) }),
+    })
+      .then(() => {
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
+      })
+      .catch(() => setSaveStatus("idle"));
+  }, [addedExams, loaded]);
 
   const handleClearAll = () => {
     setAddedExams([]);
@@ -233,14 +231,13 @@ export default function ExamSearch({ onEventsChange }: ExamSearchProps) {
               </span>
             ))}
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleSave}
-              disabled={saveStatus === "saving"}
-              className="text-xs font-semibold bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
-            >
-              {saveStatus === "saving" ? "저장 중..." : saveStatus === "saved" ? "✓ 저장 완료" : "💾 저장"}
-            </button>
+          <div className="flex items-center gap-2">
+            <span className={`text-xs transition-all ${
+              saveStatus === "saving" ? "text-gray-500" :
+              saveStatus === "saved"  ? "text-green-500" : "text-transparent"
+            }`}>
+              {saveStatus === "saving" ? "저장 중..." : "✓ 저장됨"}
+            </span>
             <button
               onClick={handleClearAll}
               className="text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 hover:border-red-500 hover:text-red-400 px-3 py-1.5 rounded-lg transition-colors"
