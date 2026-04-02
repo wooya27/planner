@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+import type { JobResearchData } from "@/types/plan";
+
 interface CustomLink {
   id: number;
   name: string;
@@ -38,11 +40,38 @@ export default function JobPage() {
   const [customLinks, setCustomLinks] = useState<CustomLink[]>([]);
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
+  const [jobResearch, setJobResearch] = useState<JobResearchData | null>(null);
+  const [researchLoading, setResearchLoading] = useState(false);
+  const [researchStatus, setResearchStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   useEffect(() => {
     const saved = localStorage.getItem("jobCustomLinks");
     if (saved) setCustomLinks(JSON.parse(saved));
+    // 저장된 취업 분석 불러오기
+    fetch("/api/job-research").then(r => r.json()).then(d => {
+      if (d.data) setJobResearch(d.data);
+    }).catch(() => {});
   }, []);
+
+  const handleJobResearch = async () => {
+    setResearchLoading(true);
+    setResearchStatus("loading");
+    try {
+      const res = await fetch("/api/job-research", { method: "POST" });
+      const data = await res.json();
+      if (data.ok && data.data) {
+        setJobResearch(data.data);
+        setResearchStatus("done");
+      } else {
+        setResearchStatus("error");
+      }
+    } catch {
+      setResearchStatus("error");
+    } finally {
+      setResearchLoading(false);
+      setTimeout(() => setResearchStatus("idle"), 4000);
+    }
+  };
 
   const saveLinks = (links: CustomLink[]) => {
     localStorage.setItem("jobCustomLinks", JSON.stringify(links));
@@ -199,6 +228,105 @@ export default function JobPage() {
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* AI 취업 분석 */}
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                <span>🤖</span> AI 채용 분석
+              </h2>
+              {jobResearch && (
+                <p className="text-xs text-gray-600 mt-0.5">마지막 업데이트: {jobResearch.updatedAt}</p>
+              )}
+            </div>
+            <button
+              onClick={handleJobResearch}
+              disabled={researchLoading}
+              className="text-xs font-semibold bg-indigo-700 border border-indigo-600 text-indigo-50 hover:bg-indigo-600 px-3 py-2 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            >
+              {researchLoading && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {researchLoading ? "분석 중..." :
+               researchStatus === "done" ? "✓ 업데이트 완료" :
+               researchStatus === "error" ? "⚠ 오류" :
+               jobResearch ? "🔄 재분석" : "🔍 채용 분석 시작"}
+            </button>
+          </div>
+
+          {!jobResearch ? (
+            <div className="text-center py-8 text-gray-600 text-sm">
+              <div className="text-2xl mb-2">🔍</div>
+              <p>원티드·사람인·잡코리아에서 데이터엔지니어/AI개발 채용 요건을 분석하고<br />기존 로드맵 기반으로 보완 플랜을 자동 생성합니다</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* 요약 */}
+              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
+                <p className="text-xs text-indigo-200 leading-relaxed">{jobResearch.summary}</p>
+              </div>
+
+              {/* 부족한 점 */}
+              {jobResearch.gaps?.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold text-amber-400 mb-2">⚠ 현재 로드맵에서 보완 필요</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {jobResearch.gaps.map((gap, i) => (
+                      <span key={i} className="text-xs px-2 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-lg">{gap}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 기술 스택 */}
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 mb-2">🛠 요구 기술 스택</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {jobResearch.techStacks.map((t, i) => (
+                    <span key={i} className={`text-xs px-2 py-1 rounded-lg border font-medium ${
+                      t.alreadyInRoadmap
+                        ? "bg-green-500/10 border-green-500/30 text-green-300"
+                        : t.frequency === "매우높음"
+                          ? "bg-red-500/10 border-red-500/30 text-red-300"
+                          : "bg-gray-700/50 border-gray-600 text-gray-300"
+                    }`} title={t.description}>
+                      {t.alreadyInRoadmap ? "✓ " : ""}{t.name}
+                      <span className="text-gray-500 ml-1">({t.category})</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-600 mt-1.5">✓ 초록 = 로드맵에 있음 · 빨강 = 매우 자주 요구됨</p>
+              </div>
+
+              {/* 포트폴리오 */}
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 mb-2">📁 추천 포트폴리오</h3>
+                <div className="space-y-2">
+                  {jobResearch.portfolioProjects.map((p, i) => (
+                    <div key={i} className={`p-2.5 rounded-lg border text-xs ${
+                      p.alreadyInRoadmap
+                        ? "bg-green-500/5 border-green-500/20"
+                        : "bg-gray-800/50 border-gray-700"
+                    }`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-white">{p.alreadyInRoadmap ? "✓ " : ""}{p.title}</span>
+                        <div className="flex gap-1">
+                          <span className="text-gray-500 bg-gray-700 px-1.5 py-0.5 rounded">{p.difficulty}</span>
+                          <span className="text-gray-500 bg-gray-700 px-1.5 py-0.5 rounded">{p.estimatedWeeks}주</span>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 mb-1">{p.description}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {p.skills.map((s, j) => (
+                          <span key={j} className="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-xs">{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

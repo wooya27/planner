@@ -50,10 +50,66 @@ export default function Home() {
   const [registrationTasks, setRegistrationTasks] = useState<import("@/types/plan").Task[]>([]);
   const [savedExamItems, setSavedExamItems] = useState<{ examId: string; round: string }[]>([]);
 
+  // 저장된 시험 기준으로 25일 전부터 자동으로 이번 주 시험 준비 세션 생성
+  const examWeeklyPlan = useMemo((): WeeklyPlan | null => {
+    if (savedExamItems.length === 0) return null;
+    const today = new Date();
+    const todayStr = today.toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    const dayKrs  = ["월요일","화요일","수요일","목요일","금요일","토요일","일요일"];
+    const weekDays = dayNames.map((name, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return { date: d.toLocaleDateString("en-CA"), name, kr: dayKrs[i] };
+    });
+    const dayPlans = new Map<string, import("@/types/plan").DayPlan>();
+    for (const { examId, round } of savedExamItems) {
+      const exam = EXAM_DB.find((e) => e.id === examId);
+      const schedule = exam?.schedules.find((s) => s.round === round);
+      if (!exam || !schedule || schedule.examDate < todayStr) continue;
+      const examDate = new Date(schedule.examDate);
+      const studyStart = new Date(examDate);
+      studyStart.setDate(studyStart.getDate() - 24);
+      const studyStartStr = studyStart.toLocaleDateString("en-CA");
+      for (const { date, name, kr } of weekDays) {
+        if (date < studyStartStr || date > schedule.examDate) continue;
+        const daysLeft = Math.ceil((examDate.getTime() - new Date(date).getTime()) / 86400000);
+        const daysSinceStart = Math.ceil((new Date(date).getTime() - studyStart.getTime()) / 86400000);
+        const type: "study" | "practice" | "review" =
+          daysSinceStart <= 8 ? "study" : daysSinceStart <= 18 ? "practice" : "review";
+        const session = {
+          topic: `[${exam.name}] D-${daysLeft} ${type === "study" ? "핵심 이론" : type === "practice" ? "문제 풀이" : "최종 복습"}`,
+          type,
+          duration: 90,
+          description: `${exam.name} ${schedule.round} 시험까지 ${daysLeft}일`,
+        };
+        if (!dayPlans.has(name)) {
+          dayPlans.set(name, { day: name, dayKr: kr, sessions: [], totalMinutes: 0 });
+        }
+        const dp = dayPlans.get(name)!;
+        dp.sessions.push(session);
+        dp.totalMinutes += 90;
+      }
+    }
+    if (dayPlans.size === 0) return null;
+    return {
+      weekNumber: 0,
+      theme: "시험 준비",
+      days: DAY_ORDER.map((d) => dayPlans.get(d)).filter(Boolean) as import("@/types/plan").DayPlan[],
+    };
+  }, [savedExamItems]);
+
   const displayWeeklyPlan = useMemo(() => {
-    if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
-    return roadmapWeek ?? plan?.weeklyPlan ?? null;
-  }, [roadmapWeek, plan]);
+    const base = (() => {
+      if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
+      return roadmapWeek ?? plan?.weeklyPlan ?? null;
+    })();
+    if (examWeeklyPlan && base) return mergeWeeklyPlans(base, examWeeklyPlan);
+    return examWeeklyPlan ?? base;
+  }, [roadmapWeek, plan, examWeeklyPlan]);
 
   const todayDayName = DAY_ORDER[new Date().getDay()];
 
@@ -194,7 +250,7 @@ export default function Home() {
     }
   };
 
-  const handleGenerate = async (request: PlanRequest) => {
+const handleGenerate = async (request: PlanRequest) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -307,7 +363,7 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 {roadmapWeek && (
                   <span className="text-xs text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-                    📅 로드맵 {roadmapWeekNum}주차 / 4주차
+                    📅 로드맵 {roadmapWeekNum}주차
                   </span>
                 )}
               </div>

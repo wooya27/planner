@@ -79,12 +79,12 @@ function buildWeeklyPlanFromMemory(week: number): NextResponse {
   return NextResponse.json({ weeklyPlan, currentWeek: week, totalWeeks: 4, startDate: START_DATE });
 }
 
-// 현재 주차 계산 (1~4, 범위 초과 시 클램프)
+// 현재 주차 계산 (최소 1주차, 상한 없음)
 function getCurrentWeek(): number {
   const start = new Date(START_DATE).getTime();
   const now   = new Date().getTime();
   const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
-  return Math.min(Math.max(Math.floor(diffDays / 7) + 1, 1), 4);
+  return Math.max(Math.floor(diffDays / 7) + 1, 1);
 }
 
 // ── POST: Sheets 로드맵 시트에 저장 ────────────────────────────────────────
@@ -126,29 +126,23 @@ export async function GET() {
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "로드맵!A1:I100",
+      range: "로드맵!A1:I1000",
     });
 
-    const allRows = (res.data.values ?? []).slice(1); // 헤더 제거
+    const allRows = (res.data.values ?? []).slice(1);
 
-    // Sheets가 비어있으면 메모리 ROADMAP에서 직접 반환
     if (allRows.length === 0) {
       return buildWeeklyPlanFromMemory(currentWeek);
     }
-    const weekRows = allRows.filter((r) => Number(r[0]) === currentWeek);
 
+    const weekRows = allRows.filter((r) => Number(r[0]) === currentWeek);
     const DAY_ORDER = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const daysMap = new Map<string, DayPlan>();
 
     for (const r of weekRows) {
       const dayKey = r[2] as string;
       if (!daysMap.has(dayKey)) {
-        daysMap.set(dayKey, {
-          day:          r[2] as string,
-          dayKr:        r[3] as string,
-          sessions:     [],
-          totalMinutes: 0,
-        });
+        daysMap.set(dayKey, { day: r[2] as string, dayKr: r[3] as string, sessions: [], totalMinutes: 0 });
       }
       const session: Session = {
         topic:       r[4] as string,
@@ -163,7 +157,7 @@ export async function GET() {
 
     const weeklyPlan: WeeklyPlan = {
       weekNumber: currentWeek,
-      theme:      WEEK_THEMES[currentWeek - 1] ?? "",
+      theme:      WEEK_THEMES[currentWeek - 1] ?? `${currentWeek}주차`,
       days:       DAY_ORDER.map((d) => daysMap.get(d)).filter(Boolean) as DayPlan[],
     };
 

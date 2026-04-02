@@ -56,6 +56,31 @@ export interface StudyPlan {
   studyTips: string[];
 }
 
+export interface JobTechStack {
+  name: string;
+  category: string;
+  frequency: string;
+  alreadyInRoadmap: boolean;
+  description?: string;
+}
+
+export interface JobPortfolioProject {
+  title: string;
+  skills: string[];
+  description: string;
+  difficulty: string;
+  estimatedWeeks: number;
+  alreadyInRoadmap: boolean;
+}
+
+export interface JobResearchData {
+  updatedAt: string;
+  techStacks: JobTechStack[];
+  portfolioProjects: JobPortfolioProject[];
+  summary: string;
+  gaps: string[];
+}
+
 export interface PlanRequest {
   goal: string;
   dailyHours: number;
