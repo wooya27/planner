@@ -312,6 +312,16 @@ const handleGenerate = async (request: PlanRequest) => {
           </div>
         )}
 
+        {/* 상단 네비게이션 */}
+        <div className="flex justify-center gap-3">
+          <Link href="/yearly" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
+            📅 년간플래너
+          </Link>
+          <Link href="/feedback" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
+            📝 피드백
+          </Link>
+        </div>
+
         {/* 메인: [나의비전+오늘할일+플랜입력+시험검색] [위클리플래너] */}
         <div className="grid grid-cols-1 lg:grid-cols-[540px_1fr] gap-4 items-start" style={{ minHeight: "800px" }}>
 
@@ -328,22 +338,12 @@ const handleGenerate = async (request: PlanRequest) => {
                 }).catch(() => {});
               }}
             />
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-black text-white">
-                {new Date().getFullYear()}년&nbsp;
-                {new Date().getMonth() + 1}월&nbsp;
-                {new Date().getDate()}일&nbsp;
-                <span className="text-blue-400">{["일","월","화","수","목","금","토"][new Date().getDay()]}요일</span>
-              </p>
-              <div className="flex gap-2">
-                <Link href="/yearly" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
-                  📅 년간플래너
-                </Link>
-                <Link href="/feedback" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
-                  📝 피드백
-                </Link>
-              </div>
-            </div>
+            <p className="text-lg font-black text-white">
+              {new Date().getFullYear()}년&nbsp;
+              {new Date().getMonth() + 1}월&nbsp;
+              {new Date().getDate()}일&nbsp;
+              <span className="text-blue-400">{["일","월","화","수","목","금","토"][new Date().getDay()]}요일</span>
+            </p>
             <div className="grid grid-cols-2 gap-3 items-stretch">
               {todayTasks.length > 0 ? (
                 <TodayTasks tasks={todayTasks} />
