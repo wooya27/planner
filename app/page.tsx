@@ -335,9 +335,14 @@ const handleGenerate = async (request: PlanRequest) => {
                 {new Date().getDate()}일&nbsp;
                 <span className="text-blue-400">{["일","월","화","수","목","금","토"][new Date().getDay()]}요일</span>
               </p>
-              <Link href="/yearly" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
-                📅 년간플래너
-              </Link>
+              <div className="flex gap-2">
+                <Link href="/yearly" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
+                  📅 년간플래너
+                </Link>
+                <Link href="/feedback" className="flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
+                  📝 피드백
+                </Link>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3 items-stretch">
               {todayTasks.length > 0 ? (
