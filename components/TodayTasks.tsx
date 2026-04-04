@@ -45,7 +45,7 @@ export default function TodayTasks({ tasks }: TodayTasksProps) {
   const year  = today.getFullYear();
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col min-h-0 h-full">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col lg:flex-1 lg:min-h-0 lg:h-full">
       {/* 진행 현황 */}
       <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-800">
         <p className="text-sm font-bold text-white">오늘 할 일</p>
@@ -65,7 +65,7 @@ export default function TodayTasks({ tasks }: TodayTasksProps) {
       </div>
 
       {/* Tasks */}
-      <div className="flex-1 space-y-2 overflow-y-auto">
+      <div className="space-y-2 lg:flex-1 lg:overflow-y-auto">
         {tasks.map((task) => {
           const done = completedIds.has(task.id);
           return (

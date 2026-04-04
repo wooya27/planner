@@ -80,7 +80,7 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
       </div>
 
       {/* 4×3 그리드 (1~4월 / 5~8월 / 9~12월) */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {MONTHS.map((monthLabel, i) => {
             const month = i + 1;
             const monthEvents = eventsByMonth[month] || [];

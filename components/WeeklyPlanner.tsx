@@ -127,7 +127,7 @@ export default function WeeklyPlanner({ weeklyPlan, examRegistrations = [] }: We
     examRegistrations.filter((e) => e.dayName === dayName).map(({ title, endDate }) => ({ title, endDate }));
 
   return (
-    <div className="flex flex-col h-full gap-2">
+    <div className="flex flex-col gap-2">
       {/* Header */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div>
@@ -145,14 +145,14 @@ export default function WeeklyPlanner({ weeklyPlan, examRegistrations = [] }: We
       </div>
 
       {/* 1행: 월 화 수 */}
-      <div className="grid grid-cols-3 gap-2 flex-1">
+      <div className="grid grid-cols-3 gap-2 lg:flex-1">
         {ROW1.map((dayName) => (
           <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} examReg={getExamReg(dayName)} />
         ))}
       </div>
 
       {/* 2행: 목 금 토 */}
-      <div className="grid grid-cols-3 gap-2 flex-1">
+      <div className="grid grid-cols-3 gap-2 lg:flex-1">
         {ROW2.map((dayName) => (
           <DayCard key={dayName} day={getDay(dayName)} isToday={todayDay === dayName} examReg={getExamReg(dayName)} />
         ))}

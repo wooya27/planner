@@ -80,7 +80,7 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
   const weeklyHours = studyDays.length * Number(dailyHours || 0);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 h-full flex flex-col gap-2 overflow-y-auto">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex flex-col gap-2 overflow-y-auto">
 
       {/* ── Form ── */}
       <div>

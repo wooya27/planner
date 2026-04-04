@@ -293,8 +293,8 @@ const handleGenerate = async (request: PlanRequest) => {
   }
 
   return (
-    <div className="h-screen overflow-hidden text-white">
-      <div className="max-w-[1600px] mx-auto px-4 pt-3 pb-4 h-full flex flex-col gap-3">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden text-white">
+      <div className="max-w-[1600px] mx-auto px-4 pt-3 pb-4 flex flex-col gap-3 lg:h-full">
 
         {/* Error toast */}
         {error && (
@@ -319,10 +319,10 @@ const handleGenerate = async (request: PlanRequest) => {
         )}
 
         {/* 메인: [비전+통계+오늘할일] [위클리플래너] [플랜입력] */}
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_300px] gap-3 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_300px] gap-3 lg:flex-1 lg:min-h-0">
 
           {/* 좌측: 날짜 → 나의비전 → 통계 → 오늘할일 */}
-          <div className="flex flex-col gap-2 min-h-0">
+          <div className="flex flex-col gap-2 lg:min-h-0">
             {/* 날짜 & 시간 */}
             <div className="flex-shrink-0">
               <p className="text-2xl font-medium text-white leading-tight">
@@ -382,7 +382,7 @@ const handleGenerate = async (request: PlanRequest) => {
             })()}
 
             {/* 오늘 할 일 */}
-            <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="lg:flex-1 lg:min-h-0 lg:overflow-hidden">
               {todayTasks.length > 0 ? (
                 <TodayTasks tasks={todayTasks} />
               ) : (
@@ -396,7 +396,7 @@ const handleGenerate = async (request: PlanRequest) => {
           </div>
 
           {/* 중앙: 위클리 플래너 */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex flex-col min-h-0">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex flex-col lg:min-h-0">
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
               <div className="flex items-center gap-2">
                 {roadmapWeek && (
@@ -432,7 +432,7 @@ const handleGenerate = async (request: PlanRequest) => {
           </div>
 
           {/* 우측: 네비 버튼 + 플랜 입력 */}
-          <div className="flex flex-col gap-2 min-h-0">
+          <div className="flex flex-col gap-2 lg:min-h-0">
             <div className="flex gap-2 flex-shrink-0">
               <Link href="/yearly" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
                 📅 년간플래너
