@@ -77,23 +77,19 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
   };
 
   const upcomingSchedule = selectedExam ? getUpcomingSchedule(selectedExam) : null;
-  const endDateStr = goalInfo
-    ? (() => { const d = new Date(goalInfo.estimatedEndDate); return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; })()
-    : null;
-
   const weeklyHours = studyDays.length * Number(dailyHours || 0);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full flex flex-col gap-4 overflow-y-auto">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 h-full flex flex-col gap-2 overflow-y-auto">
 
       {/* ── Form ── */}
       <div>
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">✏️ 플랜 입력</h2>
+        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">✏️ 플랜 입력</h2>
 
         {/* 학습 모드 토글 */}
-        <div className="flex gap-1 mb-3 bg-gray-800 rounded-lg p-0.5">
+        <div className="flex gap-1 mb-2 bg-gray-800 rounded-lg p-0.5">
           <button type="button" onClick={() => setStudyMode("general")}
-            className={`flex-1 text-xs font-semibold py-1.5 rounded-md transition-all ${
+            className={`flex-1 text-xs font-semibold py-2.5 rounded-md transition-all ${
               studyMode === "general"
                 ? "bg-amber-800 text-amber-50"
                 : "text-gray-500 hover:text-gray-300"
@@ -101,7 +97,7 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
             📖 일반 공부
           </button>
           <button type="button" onClick={() => setStudyMode("certification")}
-            className={`flex-1 text-xs font-semibold py-1.5 rounded-md transition-all ${
+            className={`flex-1 text-xs font-semibold py-2.5 rounded-md transition-all ${
               studyMode === "certification"
                 ? "bg-amber-800 text-amber-50"
                 : "text-gray-500 hover:text-gray-300"
@@ -110,7 +106,7 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-2">
 
           {/* Goal */}
           <div className="relative">
@@ -224,47 +220,9 @@ export default function GoalPanel({ goalInfo, onGenerate, isLoading }: GoalPanel
         </form>
       </div>
 
-      {/* ── Goal Info ── */}
-      {goalInfo && (
-        <div className="border-t border-gray-800 pt-4">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📊 목표 현황</h2>
-          <div className="space-y-2">
-            {[
-              { label: "총 학습량", value: `${goalInfo.totalHours}h`, color: "text-white" },
-              { label: "하루 목표", value: `${goalInfo.dailyHours}h`, color: "text-blue-400" },
-              { label: "목표일",   value: endDateStr ?? "-",           color: "text-purple-400" },
-            ].map((item) => (
-              <div key={item.label} className="flex justify-between">
-                <span className="text-xs text-gray-500">{item.label}</span>
-                <span className={`text-xs font-bold ${item.color}`}>{item.value}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center mt-3">
-            <div className="relative w-14 h-14">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 56 56">
-                <circle cx="28" cy="28" r="22" fill="none" stroke="#1f2937" strokeWidth="6" />
-                <circle cx="28" cy="28" r="22" fill="none" stroke="url(#pg2)" strokeWidth="6" strokeLinecap="round"
-                  strokeDasharray={`${2*Math.PI*22}`}
-                  strokeDashoffset={`${2*Math.PI*22*(1-goalInfo.progressPercent/100)}`}
-                  className="transition-all duration-1000" />
-                <defs>
-                  <linearGradient id="pg2" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#8b5cf6" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-black text-white">{goalInfo.progressPercent}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── 뽀모도로 타이머 ── */}
-      <div className="border-t border-gray-800 pt-4">
+      <div className="border-t border-gray-800 pt-2">
         <PomodoroTimer />
       </div>
     </div>

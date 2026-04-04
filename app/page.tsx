@@ -44,6 +44,7 @@ export default function Home() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError]                 = useState<string | null>(null);
   const [syncStatus, setSyncStatus]       = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [now, setNow] = useState(new Date());
   const [roadmapWeek, setRoadmapWeek]       = useState<WeeklyPlan | null>(null);
   const [roadmapWeekNum, setRoadmapWeekNum] = useState(0);
   const [roadmapIniting, setRoadmapIniting] = useState(false);
@@ -111,7 +112,12 @@ export default function Home() {
     return examWeeklyPlan ?? base;
   }, [roadmapWeek, plan, examWeeklyPlan]);
 
-  const todayDayName = DAY_ORDER[new Date().getDay()];
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const todayDayName = DAY_ORDER[now.getDay()];
 
   // 이번 주 시험 접수 시작일 계산
   const weekExamRegistrations = useMemo((): ExamRegEvent[] => {
@@ -287,12 +293,12 @@ const handleGenerate = async (request: PlanRequest) => {
   }
 
   return (
-    <div className="min-h-screen text-white">
-      <div className="max-w-[1600px] mx-auto p-4 space-y-4">
+    <div className="h-screen overflow-hidden text-white">
+      <div className="max-w-[1600px] mx-auto px-4 pt-3 pb-4 h-full flex flex-col gap-3">
 
         {/* Error toast */}
         {error && (
-          <div className="bg-red-900/90 border border-red-700 text-red-200 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
+          <div className="bg-red-900/90 border border-red-700 text-red-200 px-4 py-2 rounded-lg text-sm flex items-center justify-between flex-shrink-0">
             <span>⚠️ {error}</span>
             <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200 ml-4">✕</button>
           </div>
@@ -312,21 +318,22 @@ const handleGenerate = async (request: PlanRequest) => {
           </div>
         )}
 
-        {/* 상단 네비게이션 */}
-        <div className="flex justify-center gap-3">
-          <Link href="/yearly" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all">
-            📅 년간플래너
-          </Link>
-          <Link href="/feedback" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
-            📝 피드백
-          </Link>
-        </div>
+        {/* 메인: [비전+통계+오늘할일] [위클리플래너] [플랜입력] */}
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_300px] gap-3 flex-1 min-h-0">
 
-        {/* 메인: [나의비전+오늘할일+플랜입력+시험검색] [위클리플래너] */}
-        <div className="grid grid-cols-1 lg:grid-cols-[540px_1fr] gap-4 items-start" style={{ minHeight: "800px" }}>
-
-          {/* 좌측: 나의비전 → 오늘할일+플랜입력 나란히 → 시험검색 */}
-          <div className="flex flex-col gap-3">
+          {/* 좌측: 날짜 → 나의비전 → 통계 → 오늘할일 */}
+          <div className="flex flex-col gap-2 min-h-0">
+            {/* 날짜 & 시간 */}
+            <div className="flex-shrink-0">
+              <p className="text-2xl font-medium text-white leading-tight">
+                {now.getFullYear()}년 {now.getMonth() + 1}월 {now.getDate()}일&nbsp;
+                <span className="text-blue-400">{["일","월","화","수","목","금","토"][now.getDay()]}요일</span>
+              </p>
+              <p className="text-5xl font-light text-gray-300 tabular-nums tracking-widest mt-1">
+                {String(now.getHours()).padStart(2,"0")}:{String(now.getMinutes()).padStart(2,"0")}
+                <span className="text-3xl text-gray-500">:{String(now.getSeconds()).padStart(2,"0")}</span>
+              </p>
+            </div>
             <VisionBoard
               goalInfo={plan?.goalInfo}
               studyTips={plan?.studyTips}
@@ -338,32 +345,58 @@ const handleGenerate = async (request: PlanRequest) => {
                 }).catch(() => {});
               }}
             />
-            <p className="text-lg font-black text-white">
-              {new Date().getFullYear()}년&nbsp;
-              {new Date().getMonth() + 1}월&nbsp;
-              {new Date().getDate()}일&nbsp;
-              <span className="text-blue-400">{["일","월","화","수","목","금","토"][new Date().getDay()]}요일</span>
-            </p>
-            <div className="grid grid-cols-2 gap-3 items-stretch">
+
+            {/* 목표 통계 (goalInfo 있을 때) */}
+            {plan?.goalInfo && (() => {
+              const g = plan.goalInfo!;
+              const weeksLeft = g.estimatedWeeks ?? 0;
+              const daysLeft = weeksLeft * 7;
+              const endDate = g.estimatedEndDate ? new Date(g.estimatedEndDate) : null;
+              const endDateStr = endDate
+                ? `${endDate.getMonth()+1}/${endDate.getDate()}`
+                : "-";
+              return (
+                <div className="flex-shrink-0 bg-gray-900 border border-gray-800 rounded-xl p-2">
+                  <div className="grid grid-cols-4 gap-1.5 mb-2">
+                    {[
+                      { value: `D-${daysLeft}`, label: "목표까지", color: "text-white" },
+                      { value: `${g.totalHours}h`, label: "총학습량", color: "text-amber-400" },
+                      { value: `${g.dailyHours}h`, label: "하루목표", color: "text-green-400" },
+                      { value: `${weeksLeft}주`, label: "예상기간", color: "text-purple-400" },
+                    ].map((s) => (
+                      <div key={s.label} className="bg-gray-800/60 border border-gray-700 rounded-lg py-1.5 text-center">
+                        <div className={`text-sm font-black ${s.color}`}>{s.value}</div>
+                        <div className="text-xs text-gray-600">{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
+                        style={{ width: `${Math.max(g.progressPercent, 2)}%` }} />
+                    </div>
+                    <span className="text-xs text-gray-500 flex-shrink-0">{g.progressPercent}% · 🏁{endDateStr}</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* 오늘 할 일 */}
+            <div className="flex-1 min-h-0 overflow-hidden">
               {todayTasks.length > 0 ? (
                 <TodayTasks tasks={todayTasks} />
               ) : (
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col">
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full flex flex-col">
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-gray-700 text-sm text-center">플랜 생성 후<br />오늘 할 일이 표시됩니다</p>
+                    <p className="text-gray-700 text-xs text-center">플랜 생성 후<br />오늘 할 일이 표시됩니다</p>
                   </div>
                 </div>
               )}
-              <GoalPanel
-                goalInfo={plan?.goalInfo ?? null}
-                onGenerate={handleGenerate}
-                isLoading={isLoading}
-              />
             </div>
           </div>
 
-          {/* 우측: 위클리 플래너 */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 h-full flex flex-col">
+          {/* 중앙: 위클리 플래너 */}
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
               <div className="flex items-center gap-2">
                 {roadmapWeek && (
@@ -393,9 +426,29 @@ const handleGenerate = async (request: PlanRequest) => {
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-gray-700 text-sm text-center">위 버튼으로 로드맵을 저장하거나<br />오른쪽에서 AI 플랜을 생성하세요</p>
+                <p className="text-gray-700 text-sm text-center">위 버튼으로 로드맵을 저장하거나<br />플랜을 생성하세요</p>
               </div>
             )}
+          </div>
+
+          {/* 우측: 네비 버튼 + 플랜 입력 */}
+          <div className="flex flex-col gap-2 min-h-0">
+            <div className="flex gap-2 flex-shrink-0">
+              <Link href="/yearly" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
+                📅 년간플래너
+              </Link>
+              <Link href="/feedback" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
+                📝 피드백
+              </Link>
+              <Link href="/job" className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-all">
+                🚀 취업준비
+              </Link>
+            </div>
+            <GoalPanel
+              goalInfo={plan?.goalInfo ?? null}
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+            />
           </div>
         </div>
 

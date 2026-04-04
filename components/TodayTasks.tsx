@@ -45,7 +45,7 @@ export default function TodayTasks({ tasks }: TodayTasksProps) {
   const year  = today.getFullYear();
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col min-h-0">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col min-h-0 h-full">
       {/* 진행 현황 */}
       <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-800">
         <p className="text-sm font-bold text-white">오늘 할 일</p>
@@ -93,7 +93,7 @@ export default function TodayTasks({ tasks }: TodayTasksProps) {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-base font-semibold leading-tight ${done ? "line-through text-gray-500" : "text-white"}`}>
+                  <p className={`text-xs font-semibold leading-tight ${done ? "line-through text-gray-500" : "text-white"}`}>
                     {task.title}
                   </p>
                   <div className="flex items-center gap-2 mt-1.5">

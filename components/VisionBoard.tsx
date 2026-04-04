@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Link from "next/link";
 import { GoalInfo } from "@/types/plan";
 
 interface VisionBoardProps {
@@ -49,13 +48,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
     localStorage.removeItem("visionImage");
   };
 
-  const config      = goalInfo ? difficultyConfig[goalInfo.difficulty] : null;
-  const weeksLeft   = goalInfo?.estimatedWeeks ?? 0;
-  const daysLeft    = weeksLeft * 7;
-  const endDate     = goalInfo ? new Date(goalInfo.estimatedEndDate) : null;
-  const endDateStr  = endDate
-    ? `${endDate.getFullYear()}년 ${endDate.getMonth() + 1}월 ${endDate.getDate()}일`
-    : null;
+  const config = goalInfo ? difficultyConfig[goalInfo.difficulty] : null;
 
   const quotes = [
     "지금 이 순간이 기회다 💪",
@@ -67,7 +60,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
   const quote = quotes[new Date().getDay() % quotes.length];
 
   return (
-    <div className="relative rounded-xl overflow-hidden border border-gray-800" style={{ minHeight: 300 }}>
+    <div className="relative rounded-xl overflow-hidden border border-gray-800 flex-shrink-0" style={{ minHeight: 120 }}>
 
       {/* Background */}
       {bgImage ? (
@@ -82,13 +75,13 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
         </div>
       )}
 
-      <div className="relative z-10 p-6 flex flex-col" style={{ minHeight: 300 }}>
-        <div className="flex flex-col lg:flex-row gap-6 flex-1">
+      <div className="relative z-10 p-3 flex flex-col" style={{ minHeight: 120 }}>
+        <div className="flex flex-col lg:flex-row gap-3 flex-1">
 
           {/* Left: Vision text */}
           <div className="flex-1 flex flex-col">
             {/* Toolbar */}
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1.5">
               <span className="text-xs font-bold uppercase tracking-widest text-gray-500">🎯 나의 비전</span>
               <button
                 onClick={() => setEditing(!editing)}
@@ -126,7 +119,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
             ) : (
               <div onClick={() => setEditing(true)} className="cursor-text group flex-1">
                 {visionText ? (
-                  <p className="text-xl font-bold text-white leading-relaxed whitespace-pre-wrap">{visionText}</p>
+                  <p className="text-sm font-semibold text-white leading-relaxed whitespace-pre-wrap">{visionText}</p>
                 ) : (
                   <p className="text-gray-700 text-sm italic group-hover:text-gray-500 transition-colors">
                     ✏️ 클릭해서 나의 비전·목표를 입력하세요
@@ -137,8 +130,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
 
             {/* AI goal tags */}
             {goalInfo && (
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-blue-400 font-semibold text-sm">{quote}</span>
+              <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <div className="flex flex-wrap gap-1.5">
                   {goalInfo.subjects.map((s, i) => (
                     <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25">
@@ -156,7 +148,7 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
 
             {/* Study tips */}
             {studyTips && studyTips.length > 0 && (
-              <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+              <div className="mt-1 flex gap-2 overflow-x-auto pb-1">
                 {studyTips.slice(0, 3).map((tip, i) => (
                   <div key={i} className="flex-shrink-0 bg-gray-800/40 border border-gray-700/50 rounded-lg px-3 py-1.5">
                     <p className="text-xs text-gray-400 whitespace-nowrap">
@@ -168,50 +160,11 @@ export default function VisionBoard({ goalInfo, studyTips, onVisionTextChange }:
             )}
           </div>
 
-          {/* Right: Stats */}
-          {goalInfo && (
-            <div className="flex flex-col gap-3 shrink-0">
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: `D-${daysLeft}`,           label: "목표까지",  color: "text-white" },
-                  { value: `${goalInfo.totalHours}h`,  label: "총 학습량", color: "text-amber-400" },
-                  { value: `${goalInfo.dailyHours}h`,  label: "하루 목표", color: "text-green-400" },
-                  { value: `${weeksLeft}주`,            label: "예상 기간", color: "text-purple-400" },
-                ].map((stat) => (
-                  <div key={stat.label} className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 text-center min-w-[80px]">
-                    <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>{goalInfo.progressPercent}%</span>
-                  <span>🏁 {endDateStr}</span>
-                </div>
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
-                    style={{ width: `${Math.max(goalInfo.progressPercent, 2)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-4 flex items-center gap-3 flex-wrap">
-          <Link
-            href="/job"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-800 border border-amber-700 text-amber-50 hover:bg-amber-700 transition-all"
-          >
-            🚀 취업준비
-          </Link>
-          {!goalInfo && (
-            <p className="text-xs text-gray-600">오른쪽 패널에서 목표를 입력하고 플랜을 생성하세요</p>
-          )}
-        </div>
+        {!goalInfo && (
+          <p className="text-xs text-gray-600 mt-2">오른쪽 패널에서 목표를 입력하고 플랜을 생성하세요</p>
+        )}
       </div>
     </div>
   );

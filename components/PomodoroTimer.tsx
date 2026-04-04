@@ -52,7 +52,7 @@ export default function PomodoroTimer() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
 
       {/* 모드 탭 */}
       <div className="flex gap-1 bg-gray-800 rounded-lg p-0.5">
@@ -60,7 +60,7 @@ export default function PomodoroTimer() {
           <button
             key={m}
             onClick={() => handleSwitch(m)}
-            className={`flex-1 text-xs py-1 rounded-md font-semibold transition-all ${
+            className={`flex-1 text-xs py-3 rounded-md font-semibold transition-all ${
               mode === m ? `bg-gray-700 ${MODES[m].color}` : "text-gray-600 hover:text-gray-400"
             }`}
           >
@@ -77,8 +77,8 @@ export default function PomodoroTimer() {
           style={{ width: `${progress}%` }}
         />
         {/* 시간 표시 */}
-        <div className="relative flex flex-col items-center justify-center py-5 gap-1">
-          <span className={`text-3xl font-black tabular-nums tracking-widest ${cfg.color}`}>
+        <div className="relative flex flex-col items-center justify-center py-2.5 gap-0.5">
+          <span className={`text-2xl font-black tabular-nums tracking-widest ${cfg.color}`}>
             {mins}:{secs}
           </span>
           <span className="text-xs text-gray-600">{cfg.label} 타이머</span>
@@ -89,13 +89,13 @@ export default function PomodoroTimer() {
       <div className="flex gap-2">
         <button
           onClick={() => setRunning((r) => !r)}
-          className="flex-1 text-sm font-bold py-2.5 rounded-lg border border-gray-700 bg-gray-800 text-gray-200 hover:border-gray-500 hover:bg-gray-700 transition-all"
+          className="flex-1 text-sm font-bold py-3 rounded-lg border border-gray-700 bg-gray-800 text-gray-200 hover:border-gray-500 hover:bg-gray-700 transition-all"
         >
           {running ? "⏸ 일시정지" : "▶ 시작"}
         </button>
         <button
           onClick={() => { setRunning(false); setSeconds(cfg.minutes * 60); }}
-          className="text-sm font-bold px-4 py-2.5 rounded-lg border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-all"
+          className="text-sm font-bold px-4 py-3 rounded-lg border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-all"
         >
           ↺
         </button>

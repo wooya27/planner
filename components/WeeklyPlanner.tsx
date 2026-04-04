@@ -158,9 +158,22 @@ export default function WeeklyPlanner({ weeklyPlan, examRegistrations = [] }: We
         ))}
       </div>
 
-      {/* 3행: 일요일만 (전체 폭) */}
-      <div>
-        <DayCard day={getDay("Sunday")} isToday={todayDay === "Sunday"} isSunday examReg={getExamReg("Sunday")} />
+      {/* 3행: 일요일 + 따야할 자격증 */}
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <DayCard day={getDay("Sunday")} isToday={todayDay === "Sunday"} isSunday examReg={getExamReg("Sunday")} />
+        </div>
+        <div className="flex-1 rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
+          <p className="text-xs font-semibold text-gray-400 mb-2">🎯 따야할 자격증</p>
+          <div className="grid grid-cols-2 gap-1">
+            {["정보처리기사","빅데이터분석기사","SQLD","ADSP","사회조사분석사","투자자산운용사"].map((cert) => (
+              <div key={cert} className="flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800/60 border border-gray-700/50">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+                <span className="text-xs text-gray-300 truncate">{cert}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
