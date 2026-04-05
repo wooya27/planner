@@ -38,16 +38,18 @@ function mergeWeeklyPlans(a: WeeklyPlan, b: WeeklyPlan): WeeklyPlan {
 }
 
 export default function Home() {
-  const [plan, setPlan]                   = useState<StudyPlan | null>(null);
+  const [plans, setPlans]                 = useState<StudyPlan[]>([]);
   const [isLoading, setIsLoading]         = useState(false);
   const [isSyncing, setIsSyncing]         = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError]                 = useState<string | null>(null);
   const [syncStatus, setSyncStatus]       = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [now, setNow] = useState(new Date());
-  const [roadmapWeek, setRoadmapWeek]       = useState<WeeklyPlan | null>(null);
-  const [roadmapWeekNum, setRoadmapWeekNum] = useState(0);
-  const [roadmapIniting, setRoadmapIniting] = useState(false);
+  const [roadmapWeek, setRoadmapWeek]         = useState<WeeklyPlan | null>(null);
+  const [roadmapWeekNum, setRoadmapWeekNum]   = useState(0);
+  const [roadmapCurrentWeek, setRoadmapCurrentWeek] = useState(0); // 실제 현재 주차
+  const [roadmapTotalWeeks, setRoadmapTotalWeeks]   = useState(4);
+  const [roadmapIniting, setRoadmapIniting]   = useState(false);
   const [registrationTasks, setRegistrationTasks] = useState<import("@/types/plan").Task[]>([]);
   const [savedExamItems, setSavedExamItems] = useState<{ examId: string; round: string }[]>([]);
 
@@ -104,13 +106,31 @@ export default function Home() {
   }, [savedExamItems]);
 
   const displayWeeklyPlan = useMemo(() => {
+    // 각 플랜 세션에 planId 태깅
+    const tagPlan = (wp: WeeklyPlan, planId: string): WeeklyPlan => ({
+      ...wp,
+      days: wp.days.map((day) => ({
+        ...day,
+        sessions: day.sessions.map((s) => ({ ...s, planId })),
+      })),
+    });
+
+    const plansWeekly = plans.reduce<WeeklyPlan | null>((acc, p) => {
+      const tagged = tagPlan(p.weeklyPlan, p.id);
+      if (!acc) return tagged;
+      return mergeWeeklyPlans(acc, tagged);
+    }, null);
+
+    const taggedRoadmap = roadmapWeek ? tagPlan(roadmapWeek, "__roadmap__") : null;
+    const taggedExam    = examWeeklyPlan ? tagPlan(examWeeklyPlan, "__exam__") : null;
+
     const base = (() => {
-      if (roadmapWeek && plan?.weeklyPlan) return mergeWeeklyPlans(roadmapWeek, plan.weeklyPlan);
-      return roadmapWeek ?? plan?.weeklyPlan ?? null;
+      if (taggedRoadmap && plansWeekly) return mergeWeeklyPlans(taggedRoadmap, plansWeekly);
+      return taggedRoadmap ?? plansWeekly ?? null;
     })();
-    if (examWeeklyPlan && base) return mergeWeeklyPlans(base, examWeeklyPlan);
-    return examWeeklyPlan ?? base;
-  }, [roadmapWeek, plan, examWeeklyPlan]);
+    if (taggedExam && base) return mergeWeeklyPlans(base, taggedExam);
+    return taggedExam ?? base;
+  }, [roadmapWeek, plans, examWeeklyPlan]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -159,8 +179,22 @@ export default function Home() {
             subject: "로드맵",
           }))
       : [];
-    return [...registrationTasks, ...roadmapTasks, ...(plan?.todayTasks ?? [])];
-  }, [roadmapWeek, plan, todayDayName, registrationTasks]);
+
+    const planTasks = plans.flatMap((p) =>
+      (p.weeklyPlan.days.find((d) => d.day === todayDayName)?.sessions ?? [])
+        .filter((s) => s.type !== "rest")
+        .map((s, i) => ({
+          id: `plan-${p.id}-${i}`,
+          title: s.topic,
+          duration: s.duration,
+          completed: false,
+          type: s.type as "study" | "review" | "practice",
+          subject: p.goalInfo.title,
+        }))
+    );
+
+    return [...registrationTasks, ...roadmapTasks, ...planTasks];
+  }, [roadmapWeek, plans, todayDayName, registrationTasks]);
 
   // ── 앱 시작 시 Google Sheets에서 플랜 불러오기 ──────────────────────────
   useEffect(() => {
@@ -173,7 +207,7 @@ export default function Home() {
 
         if (planRes.status === "fulfilled") {
           const data = planRes.value;
-          if (data.plan) setPlan(data.plan);
+          if (data.plans?.length) setPlans(data.plans);
           if (data.visionText && typeof window !== "undefined") {
             const local = localStorage.getItem("visionText");
             if (!local) localStorage.setItem("visionText", data.visionText);
@@ -183,6 +217,8 @@ export default function Home() {
         if (roadmapRes.status === "fulfilled" && roadmapRes.value.weeklyPlan) {
           setRoadmapWeek(roadmapRes.value.weeklyPlan);
           setRoadmapWeekNum(roadmapRes.value.currentWeek);
+          setRoadmapCurrentWeek(roadmapRes.value.currentWeek);
+          setRoadmapTotalWeeks(roadmapRes.value.totalWeeks ?? 4);
         }
 
         // 저장된 시험 접수 기간 체크
@@ -219,18 +255,17 @@ export default function Home() {
   }, []);
 
   // ── Google Sheets에 저장 ─────────────────────────────────────────────────
-  async function savePlanToSheets(newPlan: StudyPlan) {
+  async function savePlansToSheets(updatedPlans: StudyPlan[]) {
     setIsSyncing(true);
     setSyncStatus("saving");
     try {
       const visionText = typeof window !== "undefined"
         ? localStorage.getItem("visionText") ?? ""
         : "";
-
       const res = await fetch("/api/save-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: newPlan, visionText }),
+        body: JSON.stringify({ plans: updatedPlans, visionText }),
       });
       setSyncStatus(res.ok ? "saved" : "error");
     } catch {
@@ -250,10 +285,23 @@ export default function Home() {
       if (data.weeklyPlan) {
         setRoadmapWeek(data.weeklyPlan);
         setRoadmapWeekNum(data.currentWeek);
+        setRoadmapCurrentWeek(data.currentWeek);
+        setRoadmapTotalWeeks(data.totalWeeks ?? 4);
       }
     } catch { /* ignore */ } finally {
       setRoadmapIniting(false);
     }
+  };
+
+  const handleRoadmapWeekChange = async (week: number) => {
+    try {
+      const res = await fetch(`/api/roadmap?week=${week}`);
+      const data = await res.json();
+      if (data.weeklyPlan) {
+        setRoadmapWeek(data.weeklyPlan);
+        setRoadmapWeekNum(week);
+      }
+    } catch { /* ignore */ }
   };
 
 const handleGenerate = async (request: PlanRequest) => {
@@ -266,18 +314,25 @@ const handleGenerate = async (request: PlanRequest) => {
         body: JSON.stringify(request),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "서버 오류");
+        let msg = "서버 오류";
+        try { const err = await res.json(); msg = err.error || msg; } catch {}
+        throw new Error(msg);
       }
       const data: StudyPlan = await res.json();
-      setPlan(data);
-      // 생성 후 자동 저장
-      await savePlanToSheets(data);
+      const updatedPlans = [...plans, data];
+      setPlans(updatedPlans);
+      await savePlansToSheets(updatedPlans);
     } catch (e) {
       setError(e instanceof Error ? e.message : "알 수 없는 오류");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeletePlan = async (planId: string) => {
+    const updatedPlans = plans.filter((p) => p.id !== planId);
+    setPlans(updatedPlans);
+    await savePlansToSheets(updatedPlans);
   };
 
   // ── 초기 로딩 중 스피너 ──────────────────────────────────────────────────
@@ -335,20 +390,20 @@ const handleGenerate = async (request: PlanRequest) => {
               </p>
             </div>
             <VisionBoard
-              goalInfo={plan?.goalInfo}
-              studyTips={plan?.studyTips}
+              goalInfo={plans[0]?.goalInfo}
+              studyTips={plans[0]?.studyTips}
               onVisionTextChange={(text) => {
                 fetch("/api/save-plan", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ plan: plan ?? null, visionText: text }),
+                  body: JSON.stringify({ plans, visionText: text }),
                 }).catch(() => {});
               }}
             />
 
-            {/* 목표 통계 (goalInfo 있을 때) */}
-            {plan?.goalInfo && (() => {
-              const g = plan.goalInfo!;
+            {/* 목표 통계 (첫 번째 플랜 기준) */}
+            {plans[0]?.goalInfo && (() => {
+              const g = plans[0].goalInfo;
               const weeksLeft = g.estimatedWeeks ?? 0;
               const daysLeft = weeksLeft * 7;
               const endDate = g.estimatedEndDate ? new Date(g.estimatedEndDate) : null;
@@ -400,9 +455,22 @@ const handleGenerate = async (request: PlanRequest) => {
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
               <div className="flex items-center gap-2">
                 {roadmapWeek && (
-                  <span className="text-xs text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-                    📅 로드맵 {roadmapWeekNum}주차
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleRoadmapWeekChange(roadmapWeekNum - 1)}
+                      disabled={roadmapWeekNum <= 1}
+                      className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-white hover:bg-gray-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors text-xs"
+                    >◀</button>
+                    <span className="text-xs text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
+                      📅 {roadmapWeekNum}주차
+                      {roadmapWeekNum === roadmapCurrentWeek && <span className="ml-1 text-purple-300/60">현재</span>}
+                    </span>
+                    <button
+                      onClick={() => handleRoadmapWeekChange(roadmapWeekNum + 1)}
+                      disabled={roadmapWeekNum >= roadmapTotalWeeks}
+                      className="w-6 h-6 flex items-center justify-center rounded text-gray-400 hover:text-white hover:bg-gray-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors text-xs"
+                    >▶</button>
+                  </div>
                 )}
               </div>
               <button
@@ -415,7 +483,7 @@ const handleGenerate = async (request: PlanRequest) => {
             </div>
 
             {displayWeeklyPlan ? (
-              <WeeklyPlanner weeklyPlan={displayWeeklyPlan} examRegistrations={weekExamRegistrations} />
+              <WeeklyPlanner weeklyPlan={displayWeeklyPlan} examRegistrations={weekExamRegistrations} plans={plans.map((p) => ({ id: p.id, title: p.goalInfo.title }))} />
             ) : isLoading ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-3">
                 <div className="w-10 h-10 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin" />
@@ -445,8 +513,9 @@ const handleGenerate = async (request: PlanRequest) => {
               </Link>
             </div>
             <GoalPanel
-              goalInfo={plan?.goalInfo ?? null}
+              plans={plans}
               onGenerate={handleGenerate}
+              onDeletePlan={handleDeletePlan}
               isLoading={isLoading}
             />
           </div>

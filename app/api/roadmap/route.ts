@@ -79,11 +79,12 @@ function buildWeeklyPlanFromMemory(week: number): NextResponse {
   return NextResponse.json({ weeklyPlan, currentWeek: week, totalWeeks: 4, startDate: START_DATE });
 }
 
-// 현재 주차 계산 (최소 1주차, 상한 없음)
+// 현재 주차 계산 (KST 기준, 최소 1주차)
 function getCurrentWeek(): number {
-  const start = new Date(START_DATE).getTime();
-  const now   = new Date().getTime();
-  const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+  const start = new Date(START_DATE); // UTC midnight
+  const today = new Date(todayStr);   // UTC midnight (KST 날짜 기준)
+  const diffDays = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   return Math.max(Math.floor(diffDays / 7) + 1, 1);
 }
 
@@ -114,12 +115,15 @@ export async function POST() {
   }
 }
 
-// ── GET: 현재 주차 WeeklyPlan 반환 ─────────────────────────────────────────
-export async function GET() {
+// ── GET: 주차 WeeklyPlan 반환 (week 파라미터 없으면 현재 주차) ──────────────
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const weekParam = searchParams.get("week");
   const currentWeek = getCurrentWeek();
+  const requestedWeek = weekParam ? Math.max(1, Math.min(Number(weekParam), ROADMAP[ROADMAP.length - 1][0] as number)) : currentWeek;
   try {
     if (!SPREADSHEET_ID) {
-      return buildWeeklyPlanFromMemory(currentWeek);
+      return buildWeeklyPlanFromMemory(requestedWeek);
     }
 
     const sheets = getSheetsClient();
@@ -132,10 +136,10 @@ export async function GET() {
     const allRows = (res.data.values ?? []).slice(1);
 
     if (allRows.length === 0) {
-      return buildWeeklyPlanFromMemory(currentWeek);
+      return buildWeeklyPlanFromMemory(requestedWeek);
     }
 
-    const weekRows = allRows.filter((r) => Number(r[0]) === currentWeek);
+    const weekRows = allRows.filter((r) => Number(r[0]) === requestedWeek);
     const DAY_ORDER = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const daysMap = new Map<string, DayPlan>();
 
@@ -156,8 +160,8 @@ export async function GET() {
     }
 
     const weeklyPlan: WeeklyPlan = {
-      weekNumber: currentWeek,
-      theme:      WEEK_THEMES[currentWeek - 1] ?? `${currentWeek}주차`,
+      weekNumber: requestedWeek,
+      theme:      WEEK_THEMES[requestedWeek - 1] ?? `${requestedWeek}주차`,
       days:       DAY_ORDER.map((d) => daysMap.get(d)).filter(Boolean) as DayPlan[],
     };
 

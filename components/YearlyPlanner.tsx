@@ -121,7 +121,7 @@ export default function YearlyPlanner({ events }: YearlyPlannerProps) {
                     </div>
                   ) : (
                     monthEvents.map((event) => {
-                      const cfg = eventTypeConfig[event.type];
+                      const cfg = eventTypeConfig[event.type as keyof typeof eventTypeConfig] ?? eventTypeConfig.milestone;
                       return (
                         <div
                           key={event.id}

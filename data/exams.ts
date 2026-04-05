@@ -23,9 +23,9 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2026년 1회", registrationStart: "2026-01-27", registrationEnd: "2026-01-30", examDate: "2026-02-15", resultDate: "2026-03-04" },
-      { round: "2026년 2회", registrationStart: "2026-04-14", registrationEnd: "2026-04-17", examDate: "2026-05-10", resultDate: "2026-05-27" },
-      { round: "2026년 3회", registrationStart: "2026-06-16", registrationEnd: "2026-06-19", examDate: "2026-07-12", resultDate: "2026-07-29" },
+      { round: "2026년 1회", registrationStart: "2026-01-12", registrationEnd: "2026-01-15", examDate: "2026-01-30", resultDate: "2026-03-11" },
+      { round: "2026년 2회", registrationStart: "2026-04-20", registrationEnd: "2026-04-23", examDate: "2026-05-09", resultDate: "2026-06-10" },
+      { round: "2026년 3회", registrationStart: "2026-07-20", registrationEnd: "2026-07-23", examDate: "2026-08-07", resultDate: "2026-09-09" },
     ],
   },
   {
@@ -35,9 +35,9 @@ export const EXAM_DB: Exam[] = [
     organization: "한국산업인력공단 (큐넷)",
     infoUrl: "https://www.q-net.or.kr",
     schedules: [
-      { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-18", resultDate: "2026-06-05" },
-      { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-09-04" },
-      { round: "2026년 3회", registrationStart: "2026-09-21", registrationEnd: "2026-09-28", examDate: "2026-10-24", resultDate: "2026-12-11" },
+      { round: "2026년 1회", registrationStart: "2026-03-23", registrationEnd: "2026-03-26", examDate: "2026-04-18", resultDate: "2026-06-12" },
+      { round: "2026년 2회", registrationStart: "2026-06-22", registrationEnd: "2026-06-25", examDate: "2026-07-18", resultDate: "2026-09-11" },
+      { round: "2026년 3회", registrationStart: "2026-09-21", registrationEnd: "2026-09-28", examDate: "2026-10-24", resultDate: "2026-12-18" },
     ],
   },
   {

@@ -12,6 +12,7 @@ export interface Session {
   duration: number; // minutes
   type: "study" | "review" | "practice" | "rest";
   description: string;
+  planId?: string;
 }
 
 export interface DayPlan {
@@ -49,6 +50,7 @@ export interface GoalInfo {
 }
 
 export interface StudyPlan {
+  id: string;
   goalInfo: GoalInfo;
   todayTasks: Task[];
   weeklyPlan: WeeklyPlan;
@@ -85,6 +87,8 @@ export interface PlanRequest {
   goal: string;
   dailyHours: number;
   studyDays: string[];     // e.g. ["Monday","Tuesday","Thursday"]
+  startDate?: string;
   targetExamDate?: string;
   studyMode?: "general" | "certification";
+  books?: string;
 }

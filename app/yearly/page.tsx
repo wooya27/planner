@@ -17,8 +17,8 @@ export default function YearlyPage() {
       try {
         const res  = await fetch("/api/load-plan");
         const data = await res.json();
-        if (data.plan?.yearlyEvents) {
-          setPlanEvents(data.plan.yearlyEvents);
+        if (data.plans?.length) {
+          setPlanEvents(data.plans.flatMap((p: StudyPlan) => p.yearlyEvents));
         }
       } catch { /* ignore */ } finally {
         setIsLoading(false);
